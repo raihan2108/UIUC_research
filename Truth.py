@@ -6,8 +6,8 @@ import numpy as np
 # from random import random
 
 
-N = 20
-NumV = 20 	# number of variables
+N = 150
+NumV = 40 	# number of variables
 flg = 1
 link = N*2
 SD_ancestor = dict()   	# source graph dictionary	
@@ -23,9 +23,9 @@ for i in range(NumV):
 		Cn1.append(i)
 
 # print(Cn1,C)
-ai = np.random.uniform(0.3,0.9,N)
+ai = np.random.uniform(0.1,0.9,N)
 bi = np.random.uniform(0.1,0.4,N)
-d1, d0, dn1 = 0.5, 0.4, 0.1
+d1, d0, dn1 = 0.6, 0.36, 0.04
 Graph = np.zeros([N,N])
 
 # ------------------------------------
@@ -73,13 +73,12 @@ for i in Cn1:
 	SC[i,:] = 0
 	for id in User:
 		SC[i,id] = 1
-	uid = np.array(User[1:nm])
+	uid = User[1:nm]
 	follower_id =np.append(follower_id,uid)
 	first_user.append(User[0]) 		#get the first users to report
 
 # print(first_user)
-
-# print(SC[1,:])
+# print(SC)
 
 # -----Calculate the ratio of dependent sources---
 ratio = dict()
@@ -121,12 +120,16 @@ for key, val in ratio.items():
 		rebg = bi[id] + rebg
 	rebf = rebf/len(parent_list)
 	rebg = rebg/len(parent_list)
-	fi[key] = ai[key]*(1-val) + val*rebf		# should find their ancestors, D=1, SC=1
-	gi[key] = bi[key]*(1-val) + val*rebg
+	fi[key] = val*rebf	
+	gi[key] = val*rebg
+	# fi[key] = ai[key]*(1-val) + val*rebf		# should find their ancestors, D=1, SC=1
+	# gi[key] = bi[key]*(1-val) + val*rebg
 
 # get the first source of their reliability
-qi = np.zeros(N)
-hi = np.zeros(N)
+# qi = np.zeros(N)
+# hi = np.zeros(N)
+qi = np.random.uniform(0.1,0.2,N)
+hi = np.random.uniform(0.1,0.2,N)
 # print(qi)
 for id in first_user:
 	qi[id] = ai[id]
@@ -134,14 +137,11 @@ for id in first_user:
 # ---carefully----get the reliability of followers
 for id in follower_id:
 	if id in ratio.keys():
-		hi[id] = ratio[id]*qi[id]
+		hi[id] = ratio[id]*ai[0]  #here is very important for you to do
 	else:
 		hi[id] = ai[id]
 
 deta = 0.2
-PZ1 = 1	#SC=1 and D=0 independent
-PZ0=1
-PZn1 = 1
 var_len = 2*parent_len + 3*child_len + 2
 Store_Theta = np.zeros(var_len)  # Get the length of the variables
 Z1 = np.zeros(NumV)
@@ -150,6 +150,9 @@ Zn1 = np.zeros(NumV)
 while deta>0.1:
 	for j in range(NumV):
 		SCJ = SC[j,:]
+		PZ1 = 1	#SC=1 and D=0 independent
+		PZ0=1
+		PZn1 = 1
 		for i in range(N):
 			if i in ratio.keys():
 				D = 1
@@ -173,7 +176,6 @@ while deta>0.1:
 				PZn1 = PZn1*(1-hi[i])
 			else:
 				print("there is an error")
-
 		Z1[j] = PZ1*d1/(PZ1*d1 + PZ0*d0+ PZn1*dn1)   # calculate the Zj for all the independent sources SC=1
 		Z0[j] = PZ0*d0/(PZ1*d1 + PZ0*d0+ PZn1*dn1)
 		Zn1[j] = 1-Z1[j]-Z0[j]
@@ -221,20 +223,20 @@ while deta>0.1:
 		Lfi.append(fi[i])
 		Lgi.append(gi[i])
 		Lhi.append(hi[i])
-
+	# print(ai)
 	d1 = np.sum(Z1)/NumV  # when Zj=1
 	d0 = np.sum(Z0)/NumV  # when Zj=0
 	# below the list of all the variables
 	Theta = np.hstack((Lai,Lbi,Lfi,Lgi,Lhi,d1,d0))
 	Theta = np.array(Theta)
-	print(Theta)
 	deta = 	np.absolute(Theta - Store_Theta)  # get the abs
 	deta = sum(deta/len(Theta))  # calculate the average error
 	Store_Theta =Theta
-	print("it is running")
+	print("----it is running---")
+	# deta = 0.001
 
 
 
-# print(Theta)
+print(Theta)
 
 	
