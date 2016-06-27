@@ -6,7 +6,7 @@ import numpy as np
 # from random import random
 
 
-N = 10
+N = 20
 NumV = 20 	# number of variables
 flg = 1
 link = N*2
