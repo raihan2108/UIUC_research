@@ -60,10 +60,11 @@ SC = np.zeros([NumV,N])
 for j in range(NumV):
 	SC1 = np.random.randint(0, 2, N)
 	SC2 = np.random.randint(0, 2, N)
-	if j >NumV*0.2 and j<=NumV*0.8:
+	SC3 = np.random.randint(0, 2, N)
+	if j >=NumV*0.4 and j<=NumV*0.85:
 		SC[j,:] = SC1
 	else:
-		SC[j,:] = SC1|SC2
+		SC[j,:] = SC2|SC3
 
 nm = 3
 follower_id=np.empty([0, 2])   #define the empty array
@@ -105,30 +106,13 @@ child_len = len(Dep_Source)
 
 # print(ratio)
 fi = np.random.uniform(0.2,0.7,N)
-gi = np.random.uniform(0.2,0.5,N)
-'''
-fi = np.zeros(N)
-gi = np.zeros(N)
-# print(ai)
-for key, val in ratio.items():
-	parent_list = SD_ancestor[key]
-	rebf, rebg = 0, 0
-	for id in parent_list:
-		rebf = ai[id] + rebf		# the reliability of the ancestors
-		rebg = bi[id] + rebg
-	rebf = rebf/len(parent_list)
-	rebg = rebg/len(parent_list)
-	fi[key] = val*rebf	
-	gi[key] = val*rebg
-	# fi[key] = ai[key]*(1-val) + val*rebf		# should find their ancestors, D=1, SC=1
-	# gi[key] = bi[key]*(1-val) + val*rebg
-'''
+gi = np.random.uniform(0.2,0.4,N)
 
 # get the first source of their reliability
 # ---we need to find the first users of each events
 qi = np.zeros([NumV,N])
 for k in range(NumV): # each event has a first user
-	qi[k,:] = np.random.uniform(0.05,0.1,N)
+	qi[k,:] = np.random.uniform(0.1,0.2,N)
 	SC_k = SC[k,:]
 	for i in range(N):
 		if SC_k[i] == 1:
@@ -136,16 +120,16 @@ for k in range(NumV): # each event has a first user
 			break
 	qi[k,fst_id] = ai[fst_id]
 
-hi = np.random.uniform(0.1,0.2,N)
+hi = np.random.uniform(0.1,0.4,N)
 
 
-deta = 0.01
+deta = 0.1
 var_len = 2*parent_len + 3*child_len + 2
 Store_Theta = np.zeros(var_len)  # Get the length of the variables
 Z1 = np.zeros(NumV)
 Z0  = np.zeros(NumV)
 Zn1 = np.zeros(NumV)
-while deta>0.001:
+while deta>0.005:
 	for j in range(NumV):
 		SCJ = SC[j,:]
 		PZ1 = 1	#SC=1 and D=0 independent
@@ -168,10 +152,10 @@ while deta>0.001:
 				Pt = SD_ancestor[i]
 				for val in Pt:
 					if SCJ[val] ==1:
-						# fi[i] = ratio[i]*ai[val] + (1-ratio[i])*fi[i]
-						# gi[i] = ratio[i]*bi[val] + (1-ratio[i])*gi[i]
-						fi[i] = ratio[i]*ai[val] 
-						gi[i] = ratio[i]*bi[val]
+						fi[i] = ratio[i]*ai[val] + (1-ratio[i])*fi[i]
+						gi[i] = ratio[i]*bi[val] + (1-ratio[i])*gi[i]
+						# fi[i] = ratio[i]*ai[val] 
+						# gi[i] = ratio[i]*bi[val]
 						break
 				PZ1 = PZ1*fi[i]
 				PZ0 = PZ0*gi[i]
@@ -244,4 +228,5 @@ while deta>0.001:
 
 # print(Theta)
 print(Z1)
-print(C)
+for k in range(1,45):
+	print(np.sum(SC[k,:]))
