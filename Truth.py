@@ -61,7 +61,7 @@ for j in range(NumV):
 	SC1 = np.random.randint(0, 2, N)
 	SC2 = np.random.randint(0, 2, N)
 	SC3 = np.random.randint(0, 2, N)
-	if j >=NumV*0.4 and j<=NumV*0.85:
+	if j >=NumV*0.55 and j<=NumV*0.9:
 		SC[j,:] = SC1
 	else:
 		SC[j,:] = SC2|SC3
