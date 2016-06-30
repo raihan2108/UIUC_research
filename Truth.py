@@ -3,13 +3,14 @@ Huajie Shao @06/21/2016
 Function: TruthFinding paper based EM algorithm
 '''
 import numpy as np
-# from random import random
+import random
 
 
-N = 70
-NumV = 50 	# number of variables
+N = 100
+NumV = 60 	# number of variables
 flg = 1
-link = N*3
+link = int(N*1.8)
+pct = 0.4
 SD_ancestor = dict()   	# source graph dictionary	
 SD_successor = dict()
 Cn = np.random.randint(-1, 0, NumV*0.1)
@@ -22,21 +23,26 @@ for i in range(NumV):
 	if C[i] == -1:
 		Cn1.append(i)
 
-# print(Cn1,C)
-ai = np.random.uniform(0.1,0.9,N)
-bi = np.random.uniform(0.1,0.6,N)
+ai = np.random.uniform(0.3,1,N)
+bi = np.random.uniform(0.1,0.3,N)
+sfi = np.random.uniform(0.1,0.7,N)
+sgi = np.random.uniform(0.1,0.5,N)
+# below
+fi = np.zeros(N)
+gi = np.zeros(N)
 d1, d0, dn1 = 0.7, 0.2, 0.1
 Graph = np.zeros([N,N])
+
 
 # ------------------------------------
 # this function is to generate the graph
 # ------------------------------------
 while flg==1:
-	i = np.random.randint(0,N-2)
+	i = np.random.randint(0,N-5)
 	j = np.random.randint(i+1, N)
 	ele = 1
 	Graph[j][i] = ele		# column is the ancestor
-	if np.sum(sum(Graph))<link:
+	if np.sum(sum(Graph))<=link:
 		flg = 1
 	else:
 		flg = 0
@@ -58,23 +64,29 @@ SC = np.zeros([NumV,N])
 
 # generate the claims of each observation
 for j in range(NumV):
-	SC1 = np.random.randint(0, 2, N)
-	SC2 = np.random.randint(0, 2, N)
+	t = np.random.uniform(0.5,1)
+	numt = int(N*t)
+	SC1 = np.random.randint(1, 2, numt)
+	SC2 = np.random.randint(0, 1, N-numt)
+	SC12 = np.concatenate((SC1,SC2))
+	random.shuffle(SC12)
+	# tn =  np.random.uniform(0.4,0.6)
+	# nt = int(N*tn)
 	SC3 = np.random.randint(0, 2, N)
-	if j >=NumV*0.55 and j<=NumV*0.9:
-		SC[j,:] = SC1
+	# SC4 = np.random.randint(0, 1, N-nt)
+	# SC34 = np.concatenate((SC3,SC4))
+	# random.shuffle(SC34) 
+	if j >=NumV*pct:
+		SC[j,:] = SC3
 	else:
-		SC[j,:] = SC2|SC3
+		SC[j,:] = SC12
 
-nm = 3
-follower_id=np.empty([0, 2])   #define the empty array
 for i in Cn1:
+	nm = np.random.randint(3,5,1)
 	User = np.random.randint(0,N,nm)
 	SC[i,:] = 0
 	for id in User:
 		SC[i,id] = 1
-
-print(SC)
 
 # -----Calculate the ratio of dependent sources---
 ratio = dict()
@@ -84,7 +96,7 @@ for key, val in SD_ancestor.items():
 	num_same = 0.0
 	num_par = 0.0
 	for k in parent:
-		Sg = SC[:,child]
+		Sg = SC[:,child]  # get the all the reports of child
 		Sp = SC[:,k]
 		num_bit = Sg.astype(int) & Sp.astype(int)  #convert to int for matrix
 		num_same = np.sum(num_bit) + num_same
@@ -101,27 +113,28 @@ for i in range(N):
 	else:
 		Ind_Source.append(i)	# get the independent sources
 
+print(Ind_Source)
+
 parent_len = len(Ind_Source)
 child_len = len(Dep_Source)
 
-# print(ratio)
-fi = np.random.uniform(0.2,0.7,N)
-gi = np.random.uniform(0.2,0.4,N)
-
+# ------and fi and gi ---print(ratio)
 # get the first source of their reliability
 # ---we need to find the first users of each events
 qi = np.zeros([NumV,N])
+fix_qi = np.random.uniform(0.1,0.3,N)
+st_fst_id = []
 for k in range(NumV): # each event has a first user
-	qi[k,:] = np.random.uniform(0.1,0.2,N)
+	qi[k,:] = fix_qi
 	SC_k = SC[k,:]
 	for i in range(N):
 		if SC_k[i] == 1:
 			fst_id = i
 			break
 	qi[k,fst_id] = ai[fst_id]
+	st_fst_id.append(fst_id)
 
-hi = np.random.uniform(0.1,0.4,N)
-
+hi = np.random.uniform(0.1,0.3,N)
 
 deta = 0.1
 var_len = 2*parent_len + 3*child_len + 2
@@ -129,7 +142,7 @@ Store_Theta = np.zeros(var_len)  # Get the length of the variables
 Z1 = np.zeros(NumV)
 Z0  = np.zeros(NumV)
 Zn1 = np.zeros(NumV)
-while deta>0.005:
+while deta>0.001:
 	for j in range(NumV):
 		SCJ = SC[j,:]
 		PZ1 = 1	#SC=1 and D=0 independent
@@ -150,17 +163,34 @@ while deta>0.005:
 				PZn1= PZn1*(1-qi[j,i])
 			elif SCJ[i] ==1 and D == 1:
 				Pt = SD_ancestor[i]
+				flag = 0
 				for val in Pt:
 					if SCJ[val] ==1:
-						fi[i] = ratio[i]*ai[val] + (1-ratio[i])*fi[i]
-						gi[i] = ratio[i]*bi[val] + (1-ratio[i])*gi[i]
-						# fi[i] = ratio[i]*ai[val] 
-						# gi[i] = ratio[i]*bi[val]
+						# fi[i] = ratio[i]*ai[val] + (1-ratio[i])*sfi[i]
+						# gi[i] = ratio[i]*bi[val] + (1-ratio[i])*sgi[i]
+						fi[i] = ratio[i]*ai[val]
+						gi[i] = ratio[i]*bi[val]
+						flag = 1
 						break
+					if flag ==0:
+						fi[i]=(1-ratio[i])*(1-ai[val])		#parent = 0 and child =1
+						gi[i] =(1-ratio[i])*(1-bi[val])
+
 				PZ1 = PZ1*fi[i]
 				PZ0 = PZ0*gi[i]
 				PZn1 = PZn1*hi[i]
 			elif SCJ[i] ==0 and D == 1:
+				Parnt = SD_ancestor[i]
+				flag2 =0
+				for val in Parnt:
+					if SCJ[val] ==1:
+						fi[i] = (1-ratio[i])*ai[val]
+						gi[i] = (1-ratio[i])*bi[val]
+						flag2 = 1
+						break
+					if flag2 ==0:
+						fi[i]=ratio[i]*(1-ai[val])
+						gi[i] =ratio[i]*(1-bi[val])
 				PZ1 = PZ1*(1-fi[i])
 				PZ0 = PZ0*(1-gi[i])
 				PZn1 = PZn1*(1-hi[i])
@@ -195,6 +225,10 @@ while deta>0.005:
 
 		ai[i] = Z1_SC1_D0/(Z1_SC1_D0+Z1_SC0_D0)
 		bi[i] = Z0_SC1_D0/(Z0_SC1_D0+Z0_SC0_D0)
+		for ti in range(NumV):  # update the qi
+			fid = st_fst_id[ti]
+			qi[ti,fid] = ai[fid]
+
 		Lai.append(ai[i])
 		Lbi.append(bi[i])
 		# Q[i] = qi[i]
@@ -207,8 +241,8 @@ while deta>0.005:
 				Z1_SC0_D1 += Z1[j]
 				Z0_SC0_D1 += Z0[j]
 
-		fi[i] = Z1_SC1_D1/(Z1_SC1_D1+Z1_SC0_D1)*ratio[i]
-		gi[i] = Z0_SC1_D1/(Z0_SC1_D1+Z0_SC0_D1)*(1-ratio[i])
+		fi[i] = Z1_SC1_D1/(Z1_SC1_D1+Z1_SC0_D1)
+		gi[i] = Z0_SC1_D1/(Z0_SC1_D1+Z0_SC0_D1)
 		hi[i] = (1-Z1_SC1_D1-Z0_SC1_D1)/(2-Z1_SC1_D1-Z0_SC1_D1-Z1_SC0_D1-Z0_SC0_D1)
 		Lfi.append(fi[i])
 		Lgi.append(gi[i])
@@ -228,5 +262,7 @@ while deta>0.005:
 
 # print(Theta)
 print(Z1)
-for k in range(1,45):
+print(Z1[30:54])
+for k in range(30,54):
 	print(np.sum(SC[k,:]))
+# print(Theta)
