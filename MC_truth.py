@@ -8,14 +8,14 @@ import random
 
 accuray_EM =[]
 accuray_vote=[]
-for N in range(70, 120, 10):
+for NumV in range(50, 100, 10):
 	rpt_EM = []
 	rpt_vote = []
 	for mt in range(30):
-		NumV = 60 	# number of variables
+		N = 100 	# number of variables
 		flg = 1
-		link = int(N*1.5)
-		pct = 0.3
+		link = int(N*1)
+		pct = 0.4
 		SD_ancestor = dict()   	# source graph dictionary	
 		SD_successor = dict()
 		Cn = np.random.randint(-1, 0, NumV*0.1)
@@ -30,12 +30,16 @@ for N in range(70, 120, 10):
 
 		ai = np.random.uniform(0.1,0.9,N)
 		bi = np.random.uniform(0.1,0.5,N)
+		ai = np.round(ai*100)/100
+		bi = np.round(bi*100)/100
 		sfi = np.random.uniform(0.1,0.9,N)
 		sgi = np.random.uniform(0.1,0.5,N)
+		sfi = np.round(sfi*100)/100
+		sgi = np.round(sgi*100)/100
 		# below
 		fi = np.zeros(N)
 		gi = np.zeros(N)
-		d1, d0, dn1 = 0.7, 0.2, 0.1
+		d1, d0, dn1 = 0.6, 0.3, 0.1
 		Graph = np.zeros([N,N])
 
 		# ------------------------------------
@@ -52,7 +56,6 @@ for N in range(70, 120, 10):
 				flg = 0
 
 		# establish the dict to find the dependency graph
-		# print(Graph)
 		for j in range(N):
 			G_row = Graph[j,:]  # get the rows
 			G_col = Graph[:,j]
@@ -144,7 +147,7 @@ for N in range(70, 120, 10):
 		Z1 = np.zeros(NumV)
 		Z0  = np.zeros(NumV)
 		Zn1 = np.zeros(NumV)
-		while deta>0.001:
+		while deta>0.005:
 			for j in range(NumV):
 				SCJ = SC[j,:]
 				PZ1 = 1	#SC=1 and D=0 independent
@@ -177,7 +180,7 @@ for N in range(70, 120, 10):
 								flag = 1
 								break
 							if flag ==0:
-								fi[i]=sfi[i]		#parent = 0 and child =1
+								fi[i]= sfi[i]		#parent = 0 and child =1
 								gi[i] =sgi[i]
 						PZ1 = PZ1*fi[i]
 						PZ0 = PZ0*gi[i]
@@ -285,7 +288,13 @@ for N in range(70, 120, 10):
 	accuray_vote.append(mean_vote)
 	accuray_EM.append(mean_EM)
 
+fw = open('vote_accy_NumV', 'w')
+fw.write(str(accuray_vote))
+fw.close()
 
+fp = open('EM_accy_NumV', 'w')
+fp.write(str(accuray_EM))
+fp.close()
 print(accuray_vote)
 print(accuray_EM)
 

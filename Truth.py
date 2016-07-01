@@ -7,10 +7,10 @@ import random
 # import math
 
 
-N = 150
-NumV = 70 	# number of variables
+N = 100
+NumV = 60 	# number of variables
 flg = 1
-link = int(N*1.5)
+link = int(N*2)
 pct = 0.3
 SD_ancestor = dict()   	# source graph dictionary	
 SD_successor = dict()
