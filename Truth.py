@@ -4,18 +4,19 @@ Function: TruthFinding paper based EM algorithm
 '''
 import numpy as np
 import random
+# import math
 
 
-N = 100
-NumV = 60 	# number of variables
+N = 150
+NumV = 70 	# number of variables
 flg = 1
-link = int(N*1.8)
-pct = 0.4
+link = int(N*1.5)
+pct = 0.3
 SD_ancestor = dict()   	# source graph dictionary	
 SD_successor = dict()
 Cn = np.random.randint(-1, 0, NumV*0.1)
-C0 = np.random.randint(0, 1, NumV*0.2)
-C1 = np.random.randint(1, 2, NumV*0.7)		# the claims of sources
+C0 = np.random.randint(0, 1, NumV*0.1)
+C1 = np.random.randint(1, 2, NumV*0.8)		# the claims of sources
 C2 = np.concatenate((C1, C0), axis=0)
 C =  np.concatenate((C2, Cn), axis=0)   	# assertion
 Cn1 =[]   # store the negative one
@@ -23,9 +24,9 @@ for i in range(NumV):
 	if C[i] == -1:
 		Cn1.append(i)
 
-ai = np.random.uniform(0.3,1,N)
-bi = np.random.uniform(0.1,0.3,N)
-sfi = np.random.uniform(0.1,0.7,N)
+ai = np.random.uniform(0.1,0.9,N)
+bi = np.random.uniform(0.1,0.5,N)
+sfi = np.random.uniform(0.1,0.9,N)
 sgi = np.random.uniform(0.1,0.5,N)
 # below
 fi = np.zeros(N)
@@ -70,14 +71,15 @@ for j in range(NumV):
 	SC2 = np.random.randint(0, 1, N-numt)
 	SC12 = np.concatenate((SC1,SC2))
 	random.shuffle(SC12)
-	# tn =  np.random.uniform(0.4,0.6)
-	# nt = int(N*tn)
-	SC3 = np.random.randint(0, 2, N)
-	# SC4 = np.random.randint(0, 1, N-nt)
-	# SC34 = np.concatenate((SC3,SC4))
-	# random.shuffle(SC34) 
+	tn =  np.random.uniform(0.4,0.56)
+	nt = int(N*tn)
+	SC3 = np.random.randint(1, 2, nt)
+	SC4 = np.random.randint(0, 1, N-nt)
+	SC34 = np.concatenate((SC4,SC3))
+	random.shuffle(SC34)
+	# print(SC34)
 	if j >=NumV*pct:
-		SC[j,:] = SC3
+		SC[j,:] = SC34
 	else:
 		SC[j,:] = SC12
 
@@ -113,7 +115,7 @@ for i in range(N):
 	else:
 		Ind_Source.append(i)	# get the independent sources
 
-print(Ind_Source)
+# print(Ind_Source)
 
 parent_len = len(Ind_Source)
 child_len = len(Dep_Source)
@@ -136,7 +138,7 @@ for k in range(NumV): # each event has a first user
 
 hi = np.random.uniform(0.1,0.3,N)
 
-deta = 0.1
+deta = 1
 var_len = 2*parent_len + 3*child_len + 2
 Store_Theta = np.zeros(var_len)  # Get the length of the variables
 Z1 = np.zeros(NumV)
@@ -164,33 +166,23 @@ while deta>0.001:
 			elif SCJ[i] ==1 and D == 1:
 				Pt = SD_ancestor[i]
 				flag = 0
+				Lpt = len(Pt)
 				for val in Pt:
 					if SCJ[val] ==1:
 						# fi[i] = ratio[i]*ai[val] + (1-ratio[i])*sfi[i]
 						# gi[i] = ratio[i]*bi[val] + (1-ratio[i])*sgi[i]
 						fi[i] = ratio[i]*ai[val]
 						gi[i] = ratio[i]*bi[val]
+						# print(ai[val])
 						flag = 1
 						break
 					if flag ==0:
-						fi[i]=(1-ratio[i])*(1-ai[val])		#parent = 0 and child =1
-						gi[i] =(1-ratio[i])*(1-bi[val])
-
+						fi[i]=sfi[i]		#parent = 0 and child =1
+						gi[i] =sgi[i]
 				PZ1 = PZ1*fi[i]
 				PZ0 = PZ0*gi[i]
 				PZn1 = PZn1*hi[i]
 			elif SCJ[i] ==0 and D == 1:
-				Parnt = SD_ancestor[i]
-				flag2 =0
-				for val in Parnt:
-					if SCJ[val] ==1:
-						fi[i] = (1-ratio[i])*ai[val]
-						gi[i] = (1-ratio[i])*bi[val]
-						flag2 = 1
-						break
-					if flag2 ==0:
-						fi[i]=ratio[i]*(1-ai[val])
-						gi[i] =ratio[i]*(1-bi[val])
 				PZ1 = PZ1*(1-fi[i])
 				PZ0 = PZ0*(1-gi[i])
 				PZn1 = PZn1*(1-hi[i])
@@ -225,9 +217,9 @@ while deta>0.001:
 
 		ai[i] = Z1_SC1_D0/(Z1_SC1_D0+Z1_SC0_D0)
 		bi[i] = Z0_SC1_D0/(Z0_SC1_D0+Z0_SC0_D0)
-		for ti in range(NumV):  # update the qi
-			fid = st_fst_id[ti]
-			qi[ti,fid] = ai[fid]
+		# for ti in range(NumV):  # update the qi
+		# 	fid = st_fst_id[ti]
+		# 	qi[ti,fid] = ai[fid]
 
 		Lai.append(ai[i])
 		Lbi.append(bi[i])
@@ -258,11 +250,35 @@ while deta>0.001:
 	Store_Theta =Theta
 	print("----it is running---")
 	# deta = 0.001
+Z_rst = np.zeros(NumV)
+Vote = np.zeros(NumV)
+for j in range(NumV):
+	if Z1[j]>=0.5:
+		Z_rst[j] = 1
+	elif Z1[j] > 10**(-10) and Z1[j] < 0.5:
+		Z_rst[j] = 0
+	else:
+		Z_rst[j] = -1
 
 
+for k in range(NumV):
+	if np.sum(SC[k,:])>N/2:
+		Vote[k] = 1
+	elif np.sum(SC[k,:])<=N/2 and np.sum(SC[k,:])>10:
+		Vote[k] = 0
+	else:
+		Vote[k] = -1
+
 # print(Theta)
-print(Z1)
-print(Z1[30:54])
-for k in range(30,54):
-	print(np.sum(SC[k,:]))
-# print(Theta)
+ML_num = 0
+vote_num =0
+for j in range(NumV):
+	if Z_rst[j] == C[j]:
+		ML_num += 1
+	if Vote[j] == C[j]:
+		vote_num += 1
+
+print(ML_num, vote_num)
+
+
+	
