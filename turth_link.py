@@ -1,5 +1,5 @@
 '''
-Huajie Shao @06/30/2016
+Huajie Shao @07/1/2016
 Function: TruthFinding paper based EM algorithm
 '''
 import numpy as np
@@ -8,13 +8,15 @@ import random
 
 accuray_EM =[]
 accuray_vote=[]
-for N in range(50, 110, 10):
+for lk in np.arange(0.8, 2.0, 0.2):
+	# lk = lk/10
 	rpt_EM = []
 	rpt_vote = []
 	for mt in range(30):
 		NumV = 60 	# number of variables
+		N = 120
 		flg = 1
-		link = int(N*1)
+		link = int(N*lk)
 		pct = 0.4
 		SD_ancestor = dict()   	# source graph dictionary	
 		SD_successor = dict()
@@ -147,7 +149,7 @@ for N in range(50, 110, 10):
 		Z1 = np.zeros(NumV)
 		Z0  = np.zeros(NumV)
 		Zn1 = np.zeros(NumV)
-		while deta>0.005:
+		while deta>0.01:
 			for j in range(NumV):
 				SCJ = SC[j,:]
 				PZ1 = 1	#SC=1 and D=0 independent
@@ -288,11 +290,11 @@ for N in range(50, 110, 10):
 	accuray_vote.append(mean_vote)
 	accuray_EM.append(mean_EM)
 
-fw = open('vote_accy_N.txt', 'w')
+fw = open('vote_accy_link.txt', 'w')
 fw.write(str(accuray_vote))
 fw.close()
 
-fp = open('EM_accy_N.txt', 'w')
+fp = open('EM_accy_link.txt', 'w')
 fp.write(str(accuray_EM))
 fp.close()
 print(accuray_vote)
