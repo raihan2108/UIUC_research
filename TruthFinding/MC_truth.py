@@ -1,6 +1,6 @@
 '''
 Huajie Shao @06/30/2016
-Function: TruthFinding paper based EM algorithm
+Function: TruthFinding paper based EM algorithm for Man claro
 '''
 import numpy as np
 import random
@@ -8,10 +8,11 @@ import random
 
 accuray_EM =[]
 accuray_vote=[]
+itera = 30
 for N in range(50, 110, 10):
 	rpt_EM = []
 	rpt_vote = []
-	for mt in range(30):
+	for mt in range(itera):  # the number of iteration
 		NumV = 60 	# number of variables
 		flg = 1
 		link = int(N*1)
