@@ -179,7 +179,37 @@ def crowdbudget(prc,cost,R_ai,R_bi):
 	crowd_err=0.5*math.exp(-2*N*dm1**2)+0.5*math.exp(-2*N*dm2**2)
 	return crowd_err
 
+def Generate_graph(n,nk):
+	flag = 1
+	Amtx = np.zeros([n,n])
+	links = nk*n
+	while flag==1:
+		if np.sum(Amtx[0:3]) < np.around(links*0.75):
+			i = np.random.randint(0,3)
+			j = np.random.randint(i+1, n)
+		else:
+			i = np.random.randint(0,n-1)
+			j = np.random.randint(i+1,n)
+		ele = 1
+		Amtx[i,j]=ele
+		if np.sum(Amtx)<=links:
+			flag = 1
+		else:
+			flag = 0
 
+	# establish the dict to find the dependency graph
+	SD_ancestor = dict()
+	SD_successor = dict()
+	for i in range(n):
+		G_row = Amtx[i,:]  # get the rows
+		G_col = Amtx[:,i]
+		for j in range(n):
+			if G_row[j]==1:		# get the column denote the ancestor
+				SD_successor.setdefault(i, []).append(j)	# list of children [id:children]]
+			if G_col[j]==1:
+				SD_ancestor.setdefault(i, []).append(j)	# list of ancestors [id: ancestors]
+
+	return SD_ancestor
 #-----below is the main function to compare with the baselines
 
 rst_err1 = []
@@ -193,7 +223,7 @@ for mt in range(0,M):
 	arr_err3 = []
 	arr_err4 = []
 	for n in range(50,110,10):
-		flag = 1
+		# flag = 1
 		ai = np.random.uniform(0.4,0.9,n)
 		bi = np.random.uniform(0.1,0.3,n)
 		ai = np.around(ai*1000)/1000
@@ -225,37 +255,9 @@ for mt in range(0,M):
 		pr = s_prc
 		Pa = ai
 		Pb = bi
-		# ---the following is to generate the graph and its Matrix---
-		Amtx = np.zeros([n,n])
-		# print(Amtx[0:2,:])
-		links = nk*n
-		while flag==1:
-			print("it is enter here")
-			if np.sum(Amtx[0:3]) < np.around(links*0.75):
-				i = np.random.randint(0,3)
-				j = np.random.randint(i+1, n)
-			else:
-				i = np.random.randint(0,n-1)
-				j = np.random.randint(i+1,n)
-			ele = 1
-			Amtx[i,j]=ele
-			if np.sum(Amtx)<=links:
-				flag = 1
-			else:
-				flag = 0
-		print(Amtx)
-		# establish the dict to find the dependency graph
-		SD_ancestor = dict()
-		SD_successor = dict()
-		for i in range(n):
-			G_row = Amtx[i,:]  # get the rows
-			G_col = Amtx[:,i]
-			for j in range(n):
-				if G_row[j]==1:		# get the column denote the ancestor
-					SD_successor.setdefault(i, []).append(j)	# list of children [id:children]]
-				if G_col[j]==1:
-					SD_ancestor.setdefault(i, []).append(j)	# list of ancestors [id: ancestors]
-
+		# --#function is to generate the Matrix graph ------
+		SD_ancestor = Generate_graph(n,nk)
+		#---------------------
 		for s in range(n):
 			if s in SD_ancestor.keys():
 				parent = SD_ancestor[s]
