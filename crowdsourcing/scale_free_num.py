@@ -6,6 +6,7 @@ we calculate the expected error by changing the N of sources
 
 import numpy as np
 from math import factorial 
+import math
 # import random
 # from subfun_test import test   this could import the function
 
@@ -14,22 +15,22 @@ from math import factorial
 # to choose the sources
 def Hfun_reb(cost, new_price, k, n):
 	st_num = []
-	if np.sum(new_price[0:k]) <= cost:  # e.g k=3 there are 4 numbers
+	if np.sum(new_price[0:k+1]) <= cost:  # e.g k=3 there are 4 numbers
 		st_num = list(range(0,k+1))
-	elif np.sum(new_price[0:k-1]) <= cost:
+	elif np.sum(new_price[0:k]) <= cost:
 		for j in range(k+1, n):
-			Sum_cost = np.sum(new_price[0:k-1]) + new_price[j]
+			Sum_cost = np.sum(new_price[0:k]) + new_price[j]
 			if Sum_cost <= cost:
 				st_num = list(range(0,k))
 				st_num.append(j)
 			else:
-				if j < n:
-					Sum_cost = np.sum(new_price[0:k-2]) + new_price[j] + new_price[j+1]
+				if j < n-1:
+					Sum_cost = np.sum(new_price[0:k-1]) + new_price[j] + new_price[j+1]
 					if Sum_cost<cost:
 						st_num = list(range(0,k-1))
 						st_num.extend([j, j+1])
 					else:
-						st_num = list(range(0,k-2))
+						st_num = list(range(0,k-1))
 	return st_num
 
 # define the combinations
@@ -68,12 +69,22 @@ def fun_window6(Rai,Rbi):
 			B6.append(Rbi[i])
 
 	# get the mean val of each group
-	mc1,mc2,mc3,mc4,mc5,mc6 = np.mean(C1),np.mean(C2),np.mean(C3),np.mean(C4),np.mean(C5),np.mean(C6)
-	mb1,mb2,mb3,mb4,mb5,mb6 = np.mean(B1),np.mean(B2),np.mean(B3),np.mean(B4),np.mean(B5),np.mean(B6)
+	C=[C1, C2, C3, C4, C5, C6]
+	B=[B1, B2, B3, B4, B5, B6]
+	mc = np.zeros(delta)
+	mb = np.zeros(delta)
+	for i in range(delta):
+		arr_c = C[i]
+		arr_b = B[i]
+		if len(arr_c)>=1:
+			mc[i] = np.mean(arr_c)
+			mb[i] = np.mean(arr_b)
+
 	L1,L2,L3,L4,L5,L6 = len(C1), len(C2),len(C3),len(C4),len(C5),len(C6)
 	L = [L1,L2,L3,L4,L5,L6]
-	mc = [mc1,mc2,mc3,mc4,mc5,mc6]
-	mb = [mb1,mb2,mb3,mb4,mb5,mb6]
+	# print("the L is",L)
+	# mc = [mc1,mc2,mc3,mc4,mc5,mc6]
+	# mb = [mb1,mb2,mb3,mb4,mb5,mb6]
 	# ST1,ST2,ST3,ST4,ST5,ST6 = [],[],[],[],[],[]
 	ST_all, SF_all = [], []
 	t = 0
@@ -86,14 +97,15 @@ def fun_window6(Rai,Rbi):
 				ST_list.append(st)
 				SF_list.append(sf)
 		else:
-			ST_list = 1
-			ST_list = 1
+			st = 1.0
+			sf = 1.0
+			ST_list.append(st)
+			SF_list.append(sf)
 		t += 1
 
 		ST_all.extend([ST_list])
 		SF_all.extend([SF_list])
-
-	# calculate the expected error
+	#---##calculate the expected error
 	for n1 in range(L1+1):
 		for n2 in range(L2+1):
 			for n3 in range(L3+1):
@@ -105,7 +117,7 @@ def fun_window6(Rai,Rbi):
 							PErr = min(PCt,PCf)
 							Sum += PErr
 
-	Err = 0.5*PErr
+	Err = 0.5*Sum
 	return Err
 
 # define the random function
@@ -150,23 +162,26 @@ def cost_only(Ra,Rb,Fee,cost):
 		Rbi.append(Rb[ids])
 
 	cost_err = fun_window6(Rai,Rbi)
+	return cost_err
 
-def crowdbudget(prc,cost,R_ai, R_bi):
+# #the below is the crowdbudget algorithm---
+
+def crowdbudget(prc,cost,R_ai,R_bi):
 	u1=np.mean(R_ai)
-    u2=np.mean(R_bi)
-    dm1=abs(u1-0.5)
-    dm2=abs(0.5-u2)
-    mc=np.mean(prc)
-    N=round(cost/mc+1)
-    crowd_err=0.5*exp(-2*N*dm2**2)+0.5*exp(-2*N*dm2**2)
-    return crowd_err
+	u2=np.mean(R_bi)
+	dm1=abs(u1-0.5)
+	dm2=abs(0.5-u2)
+	mc=np.mean(prc)
+	N=round(cost/mc+1)
+	crowd_err=0.5*exp(-2*N*dm2**2)+0.5*exp(-2*N*dm2**2)
+	return crowd_err
 
 
 #-----below is the main function to compare with the baselines
 nk = 2
 w = 0.8
-cost = 60
-M= 5	# Ma Carlo
+cost = 50
+M= 15	# Ma Carlo
 rst_err1 = []
 rst_err2 = []
 rst_err3 = []
@@ -178,26 +193,28 @@ for mt in range(0,M):
 	arr_err2 = []
 	arr_err3 = []
 	arr_err4 = []
-	for n in range(20,45,5):
+	for n in range(40,70,5):
 		flag = 0
 		# Sji = np.empty(n)
 		ai = np.random.uniform(0.4,0.9,n)
 		bi = np.random.uniform(0.1,0.5,n)
 		ai = np.around(ai*1000)/1000
 		bi = np.around(bi*1000)/1000
-		s_prc = np.random.randint(1, 5, n)  # the prices for each source
+		s_prc = np.random.uniform(1, 5, n)  # the prices for each source
 
 		# ---below fun: store the [ai, id]
 		dict_ai = dict()
 		dict_bi = dict()
 		dict_pr = dict()
 		for i in range(n):
-			dict_ai[i] = ai[i] 
+			dict_ai[ai[i]] = i
 			dict_bi[i] = bi[i]  	# store [id: bi]
-			dict_pr[i] = s_prc[i]
+			dict_pr[s_prc[i]] = i
 		S_ai = ai  # save the original reliability
 		S_bi = bi
-		# make the ai and bi similar values
+		# -----------------------------------------------------
+		# --make the ai and bi similar values after sorting ai, sort first
+		# -----------------------------------------------------
 		for k in range(n):
 			key = ai[k]   # get the key of ai
 			ids = dict_ai[key]
@@ -215,15 +232,15 @@ for mt in range(0,M):
 		# print(Amtx[0:2,:])
 		links = nk*n
 		while flag==1:
-			if np.sum(np.sum(Amtx[0:2,:])) < np.around(links*0.75):
+			if np.sum(Amtx[0:3]) < np.around(links*0.75):
 				i = np.random.randint(0,3)
 				j = np.random.randint(i+1, n)
 			else:
-				i = np.random.randint(0,n)
+				i = np.random.randint(0,n-1)
 				j = np.random.randint(i+1,n)
 			ele = 1
 			Amtx[i,j]=ele
-			if np.sum(sum(Amtx))<=links:
+			if np.sum(Amtx)<=links:
 				flag = 1
 			else:
 				flag = 0
@@ -250,8 +267,8 @@ for mt in range(0,M):
 					sum_bi_anct += bi[v]
 
 				length = len(parent)
-				Pa[s] = (1-w)/length*sum_ai_anct + w*ai[s]
-				Pb[s] = (1-w)/length*sum_bi_anct + w*bi[s]
+				Pa[s] = (1-w)*sum_ai_anct/length + w*ai[s]
+				Pb[s] = (1-w)*sum_bi_anct/length + w*bi[s]
 			ai = Pa
 			bi = Pb
 
@@ -263,8 +280,9 @@ for mt in range(0,M):
 			rab_dict[h_rab] = i
 
 		Rab = np.sort(Hurist_rab)  # get the most reliable sources
-		Rab = [: : -1]
-		# sort the reliability based on the hurisctic rab
+		Rab = sorted(Rab, reverse=True)   #get the descending order
+
+		# -------sort the reliability based on the hurisctic rab-----
 		# then we get the highest reb to lowest in order
 		# as input for the Hfun_reb
 		new_Ra = np.zeros(n)
@@ -279,14 +297,14 @@ for mt in range(0,M):
 
 		# --based on the prices, get the maxi number of sources chosen
 		ct = np.sort(pr)  # sort prices for smallest to highest
-		Ra_prc = np.empty(n)
-		Rb_prc = np.empty(n)
+		Ra_prc = np.zeros(n)
+		Rb_prc = np.zeros(n)
 		# this fun: sort the prices and its corrsponding reliability
 		for i in range(n):
 			srt_prc = ct[i]
 			ids = dict_pr[srt_prc]  # find it in dict.
-			Ra_prc = ai[ids]
-			Rb_prc = bi[ids]
+			Ra_prc[i] = ai[ids]
+			Rb_prc[i] = bi[ids]
 
 		psum = 0
 		nm = 0
@@ -295,7 +313,8 @@ for mt in range(0,M):
 			psum += ct[nm]
 		nm = nm-1   # get the max numbers of sources to report
 		min_err1 = 1
-		for k in range(1, nm):
+		# print("the nm is the",nm)
+		for k in range(2, nm):
 			st_num = Hfun_reb(cost, new_price, k, n)
 			Ran = []
 			Rbn = []
@@ -306,7 +325,8 @@ for mt in range(0,M):
 					Ran.append(new_Ra[ids])
 					Rbn.append(new_Rb[ids])
 					ppr.append(new_price[ids])
-				
+
+				# print(Ran, Rbn)
 				err1 = fun_window6(Ran,Rbn)
 				if err1 < min_err1:
 					min_err1 = err1
@@ -317,7 +337,7 @@ for mt in range(0,M):
 		# errors for the baselines
 		err2 = rand_fun(n,new_Ra,new_Rb,cost,new_price)   #same as the RA,RB in the Matlab codes
 		err3 = cost_only(Ra_prc,Rb_prc,ct,cost)
-		err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi)
+		# err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi)
 
 		arr_err1.append(err1)
 		# arr_err2.append(err2)
@@ -339,6 +359,7 @@ rst1 = np.asarray(rst_err1)
 # 
 
 Err1 = np.mean(rst1,axis=0)
+print(Err1)
 
 
 
