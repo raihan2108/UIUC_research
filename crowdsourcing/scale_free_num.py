@@ -1,7 +1,7 @@
 '''
 Huajie Shao@2016/7/14
 Functions: Source selection problem in social networks and
-we calculate the expected error by changing the N of sources
+we calculate the expected error by changing the [N of sources]
 '''
 
 import numpy as np
