@@ -11,6 +11,12 @@ import math
 # from subfun_test import test   this could import the function
 
 
+nk = 2
+w = 0.8
+cost = 60
+M= 15	# Ma Carlo
+
+
 #----define the huristic alg based on the reliability
 # to choose the sources
 def Hfun_reb(cost, new_price, k, n):
@@ -82,10 +88,6 @@ def fun_window6(Rai,Rbi):
 
 	L1,L2,L3,L4,L5,L6 = len(C1), len(C2),len(C3),len(C4),len(C5),len(C6)
 	L = [L1,L2,L3,L4,L5,L6]
-	# print("the L is",L)
-	# mc = [mc1,mc2,mc3,mc4,mc5,mc6]
-	# mb = [mb1,mb2,mb3,mb4,mb5,mb6]
-	# ST1,ST2,ST3,ST4,ST5,ST6 = [],[],[],[],[],[]
 	ST_all, SF_all = [], []
 	t = 0
 	for Ls in L:
@@ -171,33 +173,29 @@ def crowdbudget(prc,cost,R_ai,R_bi):
 	u2=np.mean(R_bi)
 	dm1=abs(u1-0.5)
 	dm2=abs(0.5-u2)
-	mc=np.mean(prc)
-	N=round(cost/mc+1)
-	crowd_err=0.5*exp(-2*N*dm2**2)+0.5*exp(-2*N*dm2**2)
+	nm=np.mean(prc)
+	N=round(cost/nm+1)
+	# print(dm1,dm2)
+	crowd_err=0.5*math.exp(-2*N*dm1**2)+0.5*math.exp(-2*N*dm2**2)
 	return crowd_err
 
 
 #-----below is the main function to compare with the baselines
-nk = 2
-w = 0.8
-cost = 50
-M= 15	# Ma Carlo
+
 rst_err1 = []
 rst_err2 = []
 rst_err3 = []
 rst_err4 = []
 for mt in range(0,M):
-	# kw = 1
-	print("the running is", mt)
+	print("running time is", mt)
 	arr_err1 = []
 	arr_err2 = []
 	arr_err3 = []
 	arr_err4 = []
-	for n in range(40,70,5):
-		flag = 0
-		# Sji = np.empty(n)
+	for n in range(50,110,10):
+		flag = 1
 		ai = np.random.uniform(0.4,0.9,n)
-		bi = np.random.uniform(0.1,0.5,n)
+		bi = np.random.uniform(0.1,0.3,n)
 		ai = np.around(ai*1000)/1000
 		bi = np.around(bi*1000)/1000
 		s_prc = np.random.uniform(1, 5, n)  # the prices for each source
@@ -232,6 +230,7 @@ for mt in range(0,M):
 		# print(Amtx[0:2,:])
 		links = nk*n
 		while flag==1:
+			print("it is enter here")
 			if np.sum(Amtx[0:3]) < np.around(links*0.75):
 				i = np.random.randint(0,3)
 				j = np.random.randint(i+1, n)
@@ -244,7 +243,7 @@ for mt in range(0,M):
 				flag = 1
 			else:
 				flag = 0
-
+		print(Amtx)
 		# establish the dict to find the dependency graph
 		SD_ancestor = dict()
 		SD_successor = dict()
@@ -313,7 +312,10 @@ for mt in range(0,M):
 			psum += ct[nm]
 		nm = nm-1   # get the max numbers of sources to report
 		min_err1 = 1
-		# print("the nm is the",nm)
+		# print("nm is the number of",nm)
+		#------------------------------------------------
+		#  Here begin to calculate the error of our method
+		#  -----------------------------------------------
 		for k in range(2, nm):
 			st_num = Hfun_reb(cost, new_price, k, n)
 			Ran = []
@@ -326,7 +328,6 @@ for mt in range(0,M):
 					Rbn.append(new_Rb[ids])
 					ppr.append(new_price[ids])
 
-				# print(Ran, Rbn)
 				err1 = fun_window6(Ran,Rbn)
 				if err1 < min_err1:
 					min_err1 = err1
@@ -337,29 +338,32 @@ for mt in range(0,M):
 		# errors for the baselines
 		err2 = rand_fun(n,new_Ra,new_Rb,cost,new_price)   #same as the RA,RB in the Matlab codes
 		err3 = cost_only(Ra_prc,Rb_prc,ct,cost)
-		# err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi)
+		# print(crowd_bi)
+		# print(len(crowd_ai))
+		err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi)
 
-		arr_err1.append(err1)
-		# arr_err2.append(err2)
-		# arr_err3.append(err3)
-		# arr_err4.append(err4)
+		arr_err1.append(min_err1)
+		arr_err2.append(err2)
+		arr_err3.append(err3)
+		arr_err4.append(err4)
 
 	rst_err1.append(arr_err1)
-	# rst_err2.append(arr_err2)
-	# rst_err3.append(arr_err3)
-	# rst_err4.append(arr_err4)
+	rst_err2.append(arr_err2)
+	rst_err3.append(arr_err3)
+	rst_err4.append(arr_err4)
 
-#---------------------------------
-# calculat the mean values
-# --------------------------------
-rst1 = np.asarray(rst_err1)
-# rst2 = np.asarray(rst_err2)
-# rst3 = np.asarray(rst_err3)
-# rst4 = np.asarray(rst_err4)
-# 
+#-------------------------------------
+# ----calculat the mean values---
+# ------------------------------------
 
-Err1 = np.mean(rst1,axis=0)
+Err1 = np.mean(rst_err1,axis=0)
+Err2 = np.mean(rst_err2,axis=0)
+Err3 = np.mean(rst_err3,axis=0)
+Err4 = np.mean(rst_err4,axis=0)
 print(Err1)
+print(Err2)
+print(Err3)
+print(Err4)
 
 
 

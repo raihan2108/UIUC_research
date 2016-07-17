@@ -5,6 +5,7 @@ Function: TruthFinding paper based EM algorithm for Man claro
 import numpy as np
 import random
 # import math
+__init__
 
 accuray_EM =[]
 accuray_vote=[]
