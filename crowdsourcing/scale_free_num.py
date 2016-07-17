@@ -72,8 +72,8 @@ def fun_window6(Rai,Rbi):
 	mb1,mb2,mb3,mb4,mb5,mb6 = np.mean(B1),np.mean(B2),np.mean(B3),np.mean(B4),np.mean(B5),np.mean(B6)
 	L1,L2,L3,L4,L5,L6 = len(C1), len(C2),len(C3),len(C4),len(C5),len(C6)
 	L = [L1,L2,L3,L4,L5,L6]
-	mc = [mc1, mc2,mc3,mc4,mc5,mc6]
-	mb = [mb1, mb2,mb3,mb4,mb5,mb6]
+	mc = [mc1,mc2,mc3,mc4,mc5,mc6]
+	mb = [mb1,mb2,mb3,mb4,mb5,mb6]
 	# ST1,ST2,ST3,ST4,ST5,ST6 = [],[],[],[],[],[]
 	ST_all, SF_all = [], []
 	t = 0
@@ -133,23 +133,54 @@ def rand_fun(N,RA,RB,cost,prc):
 # define function: cost-only
 
 def cost_only(Ra,Rb,Fee,cost):
-	
+	Psum = 0
+	N = len(Fee)
+	nums = []
+	for j in range(N):
+		if Psum <= cost:
+			Psum += Fee[j]
+			nums.append(j)
+		else:
+			break
 
+	Rai = []
+	Rbi = []
+	for ids in nums:
+		Rai.append(Ra[ids])
+		Rbi.append(Rb[ids])
 
+	cost_err = fun_window6(Rai,Rbi)
 
-
+def crowdbudget(prc,cost,R_ai, R_bi):
+	u1=np.mean(R_ai)
+    u2=np.mean(R_bi)
+    dm1=abs(u1-0.5)
+    dm2=abs(0.5-u2)
+    mc=np.mean(prc)
+    N=round(cost/mc+1)
+    crowd_err=0.5*exp(-2*N*dm2**2)+0.5*exp(-2*N*dm2**2)
+    return crowd_err
 
 
 #-----below is the main function to compare with the baselines
 nk = 2
 w = 0.8
 cost = 60
-M= 1 	# Ma Carlo
+M= 5	# Ma Carlo
+rst_err1 = []
+rst_err2 = []
+rst_err3 = []
+rst_err4 = []
 for mt in range(0,M):
-	kw = 1
-	for n in range(30,45,10):
+	# kw = 1
+	print("the running is", mt)
+	arr_err1 = []
+	arr_err2 = []
+	arr_err3 = []
+	arr_err4 = []
+	for n in range(20,45,5):
 		flag = 0
-		Sji = np.empty(n)
+		# Sji = np.empty(n)
 		ai = np.random.uniform(0.4,0.9,n)
 		bi = np.random.uniform(0.1,0.5,n)
 		ai = np.around(ai*1000)/1000
@@ -205,19 +236,20 @@ for mt in range(0,M):
 			G_col = Amtx[:,i]
 			for j in range(n):
 				if G_row[j]==1:		# get the column denote the ancestor
-					SD_successor.setdefault(i, []).append(j)	# get the list of children
+					SD_successor.setdefault(i, []).append(j)	# list of children [id:children]]
 				if G_col[j]==1:
-					SD_ancestor.setdefault(j, []).append(i)	# get the list of ancestors
+					SD_ancestor.setdefault(i, []).append(j)	# list of ancestors [id: ancestors]
+
 		for s in range(n):
 			if s in SD_ancestor.keys():
-				val = SD_ancestor[s]
+				parent = SD_ancestor[s]
 				sum_ai_anct = 0
 				sum_bi_anct = 0
-				for v in val:
-					sum_ai_anct += dict_ai[v]
-					sum_bi_anct += dict_bi[v]
+				for v in parent:
+					sum_ai_anct += ai[v]
+					sum_bi_anct += bi[v]
 
-				length = len(val)
+				length = len(parent)
 				Pa[s] = (1-w)/length*sum_ai_anct + w*ai[s]
 				Pb[s] = (1-w)/length*sum_bi_anct + w*bi[s]
 			ai = Pa
@@ -278,10 +310,36 @@ for mt in range(0,M):
 				err1 = fun_window6(Ran,Rbn)
 				if err1 < min_err1:
 					min_err1 = err1
+					crowd_price = ppr
+					crowd_ai = Ran
+					crowd_bi = Rbn
 
-				# errors for the baselines
-				 err2 = rand_fun(n,new_Ra,new_Rb,cost,new_price)   #same as the RA,RB in the Matlab codes
-				 err3 = cost_only(Ra_prc,Rb_prc,ct,cost)
+		# errors for the baselines
+		err2 = rand_fun(n,new_Ra,new_Rb,cost,new_price)   #same as the RA,RB in the Matlab codes
+		err3 = cost_only(Ra_prc,Rb_prc,ct,cost)
+		err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi)
+
+		arr_err1.append(err1)
+		# arr_err2.append(err2)
+		# arr_err3.append(err3)
+		# arr_err4.append(err4)
+
+	rst_err1.append(arr_err1)
+	# rst_err2.append(arr_err2)
+	# rst_err3.append(arr_err3)
+	# rst_err4.append(arr_err4)
+
+#---------------------------------
+# calculat the mean values
+# --------------------------------
+rst1 = np.asarray(rst_err1)
+# rst2 = np.asarray(rst_err2)
+# rst3 = np.asarray(rst_err3)
+# rst4 = np.asarray(rst_err4)
+# 
+
+Err1 = np.mean(rst1,axis=0)
+
 
 
 

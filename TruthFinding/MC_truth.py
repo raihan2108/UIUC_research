@@ -64,7 +64,7 @@ for N in range(50, 110, 10):
 				if G_row[i]==1:		# get the column denote the ancestor
 					SD_ancestor.setdefault(j, []).append(i)	 	# get the list of ancestors
 				if G_col[i]==1:
-					SD_successor.setdefault(i, []).append(j)	# get the list of successors
+					SD_successor.setdefault(j, []).append(i)	# get the list of successors
 
 		SC = np.zeros([NumV,N])
 
