@@ -1,7 +1,16 @@
 '''
-Huajie Shao@2016/7/14
-Functions: Source selection problem in social networks and
-we calculate the expected error by changing the [N of sources]
+Huajie Shao@2016/7/19
+Functions: Evaluation based on Twitter data
+Source selection problem in social networks and
+expected error by changing the [N of sources]
+'''
+
+'''
+Instructions:
+[1] author_cluster.txt  lists the source to assertion relations, i.e. source_id, assertion_id
+[2] ai_rst and bi_rst represent the reliability of sources
+[3] social.rt.txt is the file that lists source relations
+[4] cluster_cred_temp.txt lists the assertion credibilities
 '''
 
 import numpy as np
@@ -9,13 +18,9 @@ from math import factorial
 from copy import deepcopy
 # import math
 # import random
-# from subfun_test import test   this could import the function
 
 
-nk = 2
-w = 0.8
 cost = 60
-M= 15	# Ma Carlo
 
 
 #----define the huristic alg based on the reliability
@@ -46,7 +51,7 @@ def n_choose_k(n,r):
 
 
 #--function: similarity based lossy estimation algorithm, expected error
-def fun_window6(Rai,Rbi):
+def fun_window6(Rai,Rbi,C_credit):
 	C1, C2, C3, C4, C5, C6= [],[],[],[],[],[]
 	B1, B2, B3, B4, B5, B6= [],[],[],[],[],[]
 	Sum=0
@@ -109,22 +114,26 @@ def fun_window6(Rai,Rbi):
 		ST_all.extend([ST_list])
 		SF_all.extend([SF_list])
 	#---##calculate the expected error
-	for n1 in range(L1+1):
-		for n2 in range(L2+1):
-			for n3 in range(L3+1):
-				for n4 in range(L4+1):
-					for n5 in range(L5+1):
-						for n6 in range(L6+1):
-							PCt =ST_all[0][n1]*ST_all[1][n2]*ST_all[2][n3]*ST_all[3][n4]*ST_all[4][n5]*ST_all[5][n6]
-							PCf =SF_all[0][n1]*SF_all[1][n2]*SF_all[2][n3]*SF_all[3][n4]*SF_all[4][n5]*SF_all[5][n6]
-							PErr = min(PCt,PCf)
-							Sum += PErr
+	Err = 0
+	for pro_asst in C_credit:
+		Sum = 0
+		for n1 in range(L1+1):
+			for n2 in range(L2+1):
+				for n3 in range(L3+1):
+					for n4 in range(L4+1):
+						for n5 in range(L5+1):
+							for n6 in range(L6+1):
+								PCt =pro_asst*ST_all[0][n1]*ST_all[1][n2]*ST_all[2][n3]*ST_all[3][n4]*ST_all[4][n5]*ST_all[5][n6]
+								PCf =(1-pro_asst)*SF_all[0][n1]*SF_all[1][n2]*SF_all[2][n3]*SF_all[3][n4]*SF_all[4][n5]*SF_all[5][n6]
+								PErr = min(PCt,PCf)
+								Sum += PErr
 
-	Err = 0.5*Sum
+		Err += Sum
+
 	return Err
 
 # define the random function
-def rand_fun(N,RA,RB,cost,prc):
+def rand_fun(N,RA,RB,cost,prc,C_credit):
 	Psum = 0
 	Num = []
 	Rai = []
@@ -141,13 +150,13 @@ def rand_fun(N,RA,RB,cost,prc):
 		Rai.append(RA[ids])
 		Rbi.append(RB[ids])
 
-	rand_err = fun_window6(Rai,Rbi)
+	rand_err = fun_window6(Rai,Rbi,C_credit)
 	return rand_err
 
 
 # define function: cost-only
 
-def cost_only(Ra,Rb,Fee,cost):
+def cost_only(Ra,Rb,Fee,cost,C_credit):
 	Psum = 0
 	N = len(Fee)
 	nums = []
@@ -164,53 +173,54 @@ def cost_only(Ra,Rb,Fee,cost):
 		Rai.append(Ra[ids])
 		Rbi.append(Rb[ids])
 
-	cost_err = fun_window6(Rai,Rbi)
+	cost_err = fun_window6(Rai,Rbi,C_credit)
 	return cost_err
 
 # #the below is the crowdbudget algorithm---
 
-def crowdbudget(prc,cost,R_ai,R_bi):
+def crowdbudget(prc,cost,R_ai,R_bi,C_credit):
 	u1=np.mean(R_ai)
 	u2=np.mean(R_bi)
 	dm1=abs(u1-0.5)
 	dm2=abs(0.5-u2)
 	nm=np.mean(prc)
 	N=round(cost/nm+1)
+	crowd_err = 0
 	# print(dm1,dm2)
-	crowd_err=0.5*np.exp(-2*N*dm1**2)+0.5*np.exp(-2*N*dm2**2)
+	for pro_asst in C_credit:
+		err=pro_asst*np.exp(-2*N*dm1**2)+0(1-pro_asst)*np.exp(-2*N*dm2**2)
+		crowd_err += err
 	return crowd_err
 
-def Generate_graph(n,nk):
-	flag = 1
-	Amtx = np.zeros([n,n])
-	links = nk*n
-	while flag==1:
-		if np.sum(Amtx[0:3]) < np.around(links*0.75):
-			i = np.random.randint(0,3)
-			j = np.random.randint(i+1, n)
-		else:
-			i = np.random.randint(0,n-1)
-			j = np.random.randint(i+1,n)
-		ele = 1
-		Amtx[i,j]=ele
-		if np.sum(Amtx)<=links:
-			flag = 1
-		else:
-			flag = 0
-
-	# establish the dict to find the dependency graph
+def Generate_graph():
 	SD_ancestor = dict()
 	SD_successor = dict()
-	for i in range(n):
-		G_row = Amtx[i,:]  # get the rows
-		G_col = Amtx[:,i]
-		for j in range(n):
-			if G_row[j]==1:		# get the column denote the ancestor
-				SD_successor.setdefault(i, []).append(j)	# list of children [id:children]]
-			if G_col[j]==1:
-				SD_ancestor.setdefault(i, []).append(j)	# list of ancestors [id: ancestors]
+	file_graph = open('social.rt.txt', 'r')
+	for rt in file_graph.readlines():
+		rtn = rt.strip().split(',')
+		SD_ancestor[rtn[0]] = rtn[1]
 
+	file_graph.close()
+	# print(SD_ancestor)
 	return SD_ancestor
+
+def Get_reb_abi():
+	f_ai = open('ai_rst.txt','r')
+	f_bi = open('bi_rst.txt','r')
+	Ra = []
+	Rb = []
+	for ai in f_ai.readlines():
+		rai = ai.split()
+		Ra.append(rai[0])
+	for bi in f_bi.readlines():
+		rbi = bi.split()
+		Rb.append(rbi[0])
+
+	return Ra,Rb
+
+def Get_assertion():
+
+
 #-----below is the main function to compare with the baselines
 
 rst_err1 = []

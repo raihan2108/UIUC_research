@@ -1,6 +1,7 @@
 '''
-Huajie Shao@2016/7/14
-Functions: Source selection problem in social networks and
+Huajie Shao@2016/7/19
+Functions: Random Graph
+Source selection problem in social networks and
 we calculate the expected error by changing the [N of sources]
 '''
 
@@ -180,17 +181,13 @@ def crowdbudget(prc,cost,R_ai,R_bi):
 	crowd_err=0.5*np.exp(-2*N*dm1**2)+0.5*np.exp(-2*N*dm2**2)
 	return crowd_err
 
-def Generate_graph(n,nk):
+def Generate_graph(n,nk):   # generate random graph!!
 	flag = 1
 	Amtx = np.zeros([n,n])
 	links = nk*n
 	while flag==1:
-		if np.sum(Amtx[0:3]) < np.around(links*0.75):
-			i = np.random.randint(0,3)
-			j = np.random.randint(i+1, n)
-		else:
-			i = np.random.randint(0,n-1)
-			j = np.random.randint(i+1,n)
+		i = np.random.randint(0,n-5)
+		j = np.random.randint(i+1,n)
 		ele = 1
 		Amtx[i,j]=ele
 		if np.sum(Amtx)<=links:
