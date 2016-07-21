@@ -20,7 +20,8 @@ from copy import deepcopy
 # import random
 
 
-cost = 60
+# cost = 60
+M = 2
 
 
 #----define the huristic alg based on the reliability
@@ -181,14 +182,14 @@ def cost_only(Ra,Rb,Fee,cost,C_credit):
 def crowdbudget(prc,cost,R_ai,R_bi,C_credit):
 	u1=np.mean(R_ai)
 	u2=np.mean(R_bi)
-	dm1=abs(u1-0.5)
-	dm2=abs(0.5-u2)
+	dm1=abs(u1-0.7)
+	dm2=abs(u2-0.3)
 	nm=np.mean(prc)
 	N=round(cost/nm+1)
 	crowd_err = 0
 	# print(dm1,dm2)
 	for pro_asst in C_credit:
-		err=pro_asst*np.exp(-2*N*dm1**2)+0(1-pro_asst)*np.exp(-2*N*dm2**2)
+		err=pro_asst*np.exp(-2*N*dm1**2)+(1-pro_asst)*np.exp(-2*N*dm2**2)
 		crowd_err += err
 	return crowd_err
 
@@ -211,103 +212,86 @@ def Get_reb_abi():
 	Rb = []
 	for ai in f_ai.readlines():
 		rai = ai.split()
-		Ra.append(rai[0])
+		int_ai = float(rai[0])
+		Ra.append(int_ai)
 	for bi in f_bi.readlines():
 		rbi = bi.split()
-		Rb.append(rbi[0])
+		int_bi = float(rbi[0])
+		Rb.append(int_bi)
 
 	return Ra,Rb
 
-def Get_assertion():
+def Pro_assertion():
+	C_credit =[]
+	credit_dict = dict()
+	f_assertion = open('c_cred.txt','r')
+	for credit in f_assertion.readlines():
+		cdt = credit.split()
+		cdt1 = float(cdt[1])
+		C_credit.append(cdt1)
+		cdt2 = float(cdt[0])
+		credit_dict[cdt2] = cdt[1]
+
+	return C_credit
 
 
 #-----below is the main function to compare with the baselines
-
 rst_err1 = []
 rst_err2 = []
 rst_err3 = []
 rst_err4 = []
+file_wt_ids = open("org_id.txt",'w')
 for mt in range(0,M):
 	print("running time is", mt)
 	arr_err1 = []
 	arr_err2 = []
 	arr_err3 = []
 	arr_err4 = []
-	for n in range(50,110,10):
+	list_ids = []
+	for cost in range(50,60,10):
 		# flag = 1
-		ai = np.random.uniform(0.4,0.9,n)
-		bi = np.random.uniform(0.1,0.3,n)
-		ai = np.around(ai*1000)/1000
-		bi = np.around(bi*1000)/1000
-		pr = np.random.uniform(1, 5, n)  # the prices for each source
-
+		ai, bi = Get_reb_abi()		# get the ai and bi
+		ai = np.array(ai)
+		bi = np.array(bi)
+		C_credit = Pro_assertion()
+		C_credit = np.array(C_credit)
+		n = len(ai)
+		pr = np.random.uniform(0.5, 2, n)  # generate the prices for source
+		pr = np.around(pr,decimals=3)
 		# ---below fun: store the [ai, id]
 		dict_ai = dict()
 		dict_bi = dict()
 		dict_pr = dict()
 		for i in range(n):
-			dict_ai[ai[i]] = i
-			dict_bi[i] = bi[i]  	# store [id: bi]
+			# dict_ai[ai[i]] = i
+			# dict_bi[i] = bi[i]  	# store [id: bi]
 			dict_pr[pr[i]] = i
-		S_ai = deepcopy(ai)  # save the original reliability
-		S_bi = deepcopy(bi)
-		s_prc = deepcopy(pr)
-		# -----------------------------------------------------
-		# --make the ai and bi similar values after sorting ai, sort first
-		# -----------------------------------------------------
-		for k in range(n):
-			key = ai[k]   # get the key of ai
-			ids = dict_ai[key]
-			S_bi[k] = dict_bi[ids]
-
-		# --- the following is to save the original ai and bi
-		# it could be used for Link ** changes and W changes---
-		ai = S_ai
-		bi = S_bi
-		pr = s_prc
-		Pa = ai
-		Pb = bi
-		# --#function is to generate the Matrix graph ------
-		SD_ancestor = Generate_graph(n,nk)
-		#---------------------
-		for s in range(n):
-			if s in SD_ancestor.keys():
-				parent = SD_ancestor[s]
-				sum_ai_anct = 0
-				sum_bi_anct = 0
-				for v in parent:
-					sum_ai_anct += ai[v]
-					sum_bi_anct += bi[v]
-
-				length = len(parent)
-				Pa[s] = (1-w)*sum_ai_anct/length + w*ai[s]
-				Pb[s] = (1-w)*sum_bi_anct/length + w*bi[s]
-			# ai = Pa
-			# bi = Pb
-
+		
 		#----below fun: sort the reliability of sources
-		Hurist_rab = 1 + ai - bi
+		Hurist_rab = 1 + ai - bi+np.random.randn(n)*0.001 #if ai and bi are the same, it is hard to find
+		# print(Hurist_rab)
 		rab_dict = dict()
 		for i in range(n):
 			h_rab = Hurist_rab[i]
 			rab_dict[h_rab] = i
 
-		Rab = np.sort(Hurist_rab)  # get the most reliable sources
-		Rab = sorted(Rab, reverse=True)   #get the descending order
+		Rab = np.sort(Hurist_rab)         # get the most reliable sources
+		Rab = sorted(Rab, reverse=True)   # get the descending order
 
 		# -------sort the reliability based on the hurisctic rab-----
 		# then we get the highest reb to lowest in order
-		# as input for the Hfun_reb
 		new_Ra = np.zeros(n)
 		new_Rb = np.zeros(n)
 		new_price = np.zeros(n)
+		ids_dict = dict()
 		for j in range(n):
 			abi = Rab[j]
 			ids = rab_dict[abi]
 			new_price[j] = pr[ids]
 			new_Ra[j] = ai[ids]
 			new_Rb[j] = bi[ids]
-
+			ids_dict[j] = ids
+		# print("the newprice",new_price)
 		# --based on the prices, get the maxi number of sources chosen
 		ct = np.sort(pr)  # sort prices for smallest to highest
 		Ra_prc = np.zeros(n)
@@ -326,6 +310,7 @@ for mt in range(0,M):
 			psum += ct[nm]
 		nm = nm-1   # get the max numbers of sources to report
 		min_err1 = 1
+		st_num=[]
 		# print("nm is the number of",nm)
 		#------------------------------------------------
 		#  Here begin to calculate the error of our method
@@ -342,30 +327,43 @@ for mt in range(0,M):
 					Rbn.append(new_Rb[ids])
 					ppr.append(new_price[ids])
 
-				err1 = fun_window6(Ran,Rbn)
+				# print(st_num)
+				err1 = fun_window6(Ran,Rbn,C_credit)
 				if err1 < min_err1:
 					min_err1 = err1
 					crowd_price = ppr
 					crowd_ai = Ran
 					crowd_bi = Rbn
+					store_ids = deepcopy(st_num)
+
+		# print("the final",crowd_price)
+		org_id = []
+		for snum in store_ids:
+			myid = ids_dict[snum]
+			org_id.append(myid)
 
 		# errors for the baselines
-		err2 = rand_fun(n,new_Ra,new_Rb,cost,new_price)   #same as the RA,RB in the Matlab codes
-		err3 = cost_only(Ra_prc,Rb_prc,ct,cost)
-		# print(crowd_bi)
+		err2 = rand_fun(n,new_Ra,new_Rb,cost,new_price,C_credit)   #same as the RA,RB in the Matlab codes
+		err3 = cost_only(Ra_prc,Rb_prc,ct,cost,C_credit)
 		# print(len(crowd_ai))
-		err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi)
+		err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi,C_credit)
 
 		arr_err1.append(min_err1)
 		arr_err2.append(err2)
 		arr_err3.append(err3)
 		arr_err4.append(err4)
+		list_ids.append(org_id)
 
 	rst_err1.append(arr_err1)
 	rst_err2.append(arr_err2)
 	rst_err3.append(arr_err3)
 	rst_err4.append(arr_err4)
+	file_wt_ids.write(str(list_ids)+'\n')
 
+
+
+
+file_wt_ids.close()
 #-------------------------------------
 # ----calculat the mean values---
 # ------------------------------------
