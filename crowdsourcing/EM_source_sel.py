@@ -12,7 +12,7 @@ import ast
 def Get_author_id():
 	author_id = dict()
 	a_id = []
-	fr_author = open('author_claim.txt','r')  #authors should be the same as following
+	fr_author = open('source-prob.txt','r')  #authors should be the same as following
 	for num, names in enumerate(fr_author):
 		nm_id = names.split()
 		if nm_id in a_id:
@@ -33,36 +33,20 @@ def Get_author_id():
 ##-----get the author and its assertions
 def Get_author_assertion():
 	author_claim = dict()
-	f_author_claim = open('author_claim.txt','r')
+	f_author_claim = open('author_cluster.txt','r')
 	for lines in f_author_claim.readlines():
 		SC = lines.split()
-		# author_claim[int(SC[0])] = int(SC[1])
-		author_claim.setdefault(SC[0], []).append(SC[1])  #string for the ID and assertion
-
-
+		author_claim.setdefault(SC[0], []).append(SC[1])  #string 
+		# print(author_claim)
 	f_author_claim.close()
 	return author_claim
-
-'''
-def Generate_graph():
-	SD_ancestor = dict()
-	SD_successor = dict()
-	file_graph = open('social.rt.txt', 'r')
-	for rt in file_graph.readlines():
-		rtn = rt.strip().split(',')
-		SD_ancestor[rtn[0]] = rtn[1]
-
-	file_graph.close()
-	# print(SD_ancestor)
-	return SD_ancestor
-'''
 
 
 
 # ------below is init the paramters---
 author_id = Get_author_id()
 # print(author_id)
-author_claim = Get_author_assertion()
+a_claim = Get_author_assertion()
 # print(author_claim)
 # SD_ancestor = Generate_graph()
 
@@ -83,7 +67,7 @@ for ids in fread_ids.readlines():
 		for nums in num_id:
 			src_id = author_id[nums]   #get the ids of selected sources
 			# get the assertions made by the selected sources
-			Assertion = author_claim[src_id]
+			Assertion = a_claim[src_id]
 			for la in Assertion:
 				fw_author_claim.write(str(src_id)+'\t'+la+'\n')
 			
@@ -119,7 +103,6 @@ for j in range(1,num_txt):
 
 
 	fw_user_claim.close()
-
 
 
 

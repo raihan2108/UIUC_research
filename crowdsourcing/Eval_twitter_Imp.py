@@ -21,7 +21,9 @@ from copy import deepcopy
 
 
 # cost = 60
-M = 10
+M = 1
+cst1 = 140
+cst2 = 150
 
 
 #----define the huristic alg based on the reliability
@@ -124,14 +126,14 @@ def fun_window6(Rai,Rbi,C_credit):
 					for n4 in range(L4+1):
 						for n5 in range(L5+1):
 							for n6 in range(L6+1):
-								PCt =pro_asst*ST_all[0][n1]*ST_all[1][n2]*ST_all[2][n3]*ST_all[3][n4]*ST_all[4][n5]*ST_all[5][n6]
-								PCf =(1-pro_asst)*SF_all[0][n1]*SF_all[1][n2]*SF_all[2][n3]*SF_all[3][n4]*SF_all[4][n5]*SF_all[5][n6]
+								PCt =0.5*ST_all[0][n1]*ST_all[1][n2]*ST_all[2][n3]*ST_all[3][n4]*ST_all[4][n5]*ST_all[5][n6]
+								PCf =(1-0.5)*SF_all[0][n1]*SF_all[1][n2]*SF_all[2][n3]*SF_all[3][n4]*SF_all[4][n5]*SF_all[5][n6]
 								PErr = min(PCt,PCf)
 								Sum += PErr
 
 		Err += Sum
 
-	return Err
+	return Err/len(C_credit)
 
 # define the random function
 def rand_fun(N,RA,RB,cost,prc,C_credit):
@@ -182,16 +184,16 @@ def cost_only(Ra,Rb,Fee,cost,C_credit):
 def crowdbudget(prc,cost,R_ai,R_bi,C_credit):
 	u1=np.mean(R_ai)
 	u2=np.mean(R_bi)
-	dm1=abs(u1-0.7)
-	dm2=abs(u2-0.3)
+	dm1=abs(u1-0.6)
+	dm2=abs(u2-0.4)
 	nm=np.mean(prc)
 	N=round(cost/nm+1)
 	crowd_err = 0
 	# print(dm1,dm2)
 	for pro_asst in C_credit:
-		err=pro_asst*np.exp(-2*N*dm1**2)+(1-pro_asst)*np.exp(-2*N*dm2**2)
+		err=0.5*np.exp(-2*N*dm1**2)+(1-0.5)*np.exp(-2*N*dm2**2)
 		crowd_err += err
-	return crowd_err
+	return crowd_err/len(C_credit)
 
 def Generate_graph():
 	SD_ancestor = dict()
@@ -252,7 +254,7 @@ for mt in range(0,M):
 	arr_err3 = []
 	arr_err4 = []
 	list_ids = []
-	for cost in range(40,70,10):
+	for cost in range(cst1,cst2,10):
 		# flag = 1
 		ai, bi = Get_reb_abi()		# get the ai and bi
 		ai = np.array(ai)
