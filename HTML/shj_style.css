@@ -1,0 +1,91 @@
+.name h1{
+	font-size: 40px;
+	font-weight: bold;
+	font-family: sans-serif;
+	/*width: 700px;*/
+	/*padding-left: 500px;*/
+	padding-top: 0px;
+}
+.name h3{
+	font-size: 20px;
+	text-align: justify;
+	/*float: right;*/
+	margin-right: 100px;
+}
+.name img{
+	width: 200px;
+	height: 250px;
+	margin-left: 50px;
+	float: left;
+	margin-right: 50px;
+	margin-top: 10px;
+	padding-bottom: 10px;
+}
+.name{
+	margin-top: 20px;
+	background: #e3e3e3;
+	overflow: hidden;
+	margin-left: 50px;
+	margin-right: 50px;
+	/*padding-left: 50px;*/
+}
+
+.menu li{
+	display: inline;
+	font-size:25px;
+	color: white;
+	padding: 40px;
+	font-weight: bold;
+}
+
+.menu li a{
+	text-decoration: none;
+	color: white;
+}
+
+.menu a:hover{
+	color: black;
+}
+
+/*.course a:hover{
+	color: black;
+}*/
+
+.menu ul{
+	list-style: none;
+	text-align: center;
+	background: green;
+	margin-right: 50px;
+	margin-left: 50px;
+}
+
+.content{
+	padding-left: 50px;
+	font-family: Arial;
+	margin-bottom: 100px;
+}
+
+.content h1{
+	/*font-size: 30px;*/
+	font-style: italic;
+	font-weight: bold;
+}
+.publication{
+	line-height: 25px;
+	margin-right: 40px;
+
+}
+.google a{
+	text-decoration: none;
+	color: red;
+	font-size: 18px;
+}
+.google a:hover{
+	color: blue;
+}
+.edu{
+	line-height: 25px;
+}
+.tech{
+	padding-left: 24px;
+}
