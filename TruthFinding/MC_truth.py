@@ -4,9 +4,73 @@ Function: TruthFinding paper based EM algorithm for Man claro
 '''
 import numpy as np
 import random
-# import math
-__init__
 
+# ------generate the graph-------
+# ------Fun: different graph--------
+def Get_graph(N,ratio):
+	nr = int(N*ratio)
+	k = N-nr		# number of depdent sources
+	Graph = np.zeros([N,N])
+	for i in range(k,N):  	# dependent sources
+		j = np.random.randint(0, i)
+		Graph[i][j] = 1		# column is the ancestor
+
+	SD_ancestor = dict()   	# source graph dictionary	
+	SD_successor = dict()
+	for j in range(N):
+		G_row = Graph[j,:]  # get the rows
+		G_col = Graph[:,j]
+		for i in range(N):
+			if G_row[i]==1:		# get the column denote the ancestor
+				SD_ancestor.setdefault(j, []).append(i)	 	# get the list of ancestors
+			if G_col[i]==1:
+				SD_successor.setdefault(j, []).append(i)	# get the list of successors
+
+	return SD_successor,SD_ancestor
+
+
+def Generate_SC(N,NumV,SD_successor,pct):   #sources'claims
+	SC = np.zeros([NumV,N])	#source and number of variables
+	# generate the claims of each observation
+	Cn = np.random.randint(-1, 0, NumV*0.4)
+	C0 = np.random.randint(0, 1, NumV*0.1)
+	C1 = np.random.randint(1, 2, NumV*0.5)
+	C = np.hstack((C1,C0,Cn))
+	random.shuffle(C)
+	for j in range(NumV):
+		t = np.random.uniform(0.4,0.9)
+		numt = int(N*t)   # number of SC = 1
+		SC1 = np.random.randint(1, 2, numt)	    # sc = 1
+		SC0 = np.random.randint(0, 1, N-numt)   # sc = 0 
+		SC01 = np.concatenate((SC0,SC1))
+		random.shuffle(SC01)
+		# generate the false assertion and let SC=1
+		tn =  np.random.uniform(0.3,0.6)
+		nt = int(N*tn)
+		SC3 = np.random.randint(1, 1.05, nt)
+		SC4 = np.random.randint(0, 1, N-nt)
+		SC34 = np.concatenate((SC4,SC3))
+		random.shuffle(SC34)
+		if j >=NumV*pct:  #number of false assertion
+			SC[j,:] = SC34
+		else:
+			SC[j,:] = SC01
+
+	Cn1 =[]   # store the negative one
+	for i in range(NumV):
+		if C[i] == -1:
+			Cn1.append(i)
+	for i in Cn1:
+		# nm = np.random.randint(3,5,1)
+		# User = np.random.randint(0,N,nm)
+		SC[i,:] = 0
+		# for id in User:
+			# SC[i,id] = 1
+
+	return SC
+
+#-------below is the main function------
+# --------Main Function-------------
 accuray_EM =[]
 accuray_vote=[]
 itera = 30
@@ -18,17 +82,12 @@ for N in range(50, 110, 10):
 		flg = 1
 		link = int(N*1)
 		pct = 0.4
-		SD_ancestor = dict()   	# source graph dictionary	
-		SD_successor = dict()
-		Cn = np.random.randint(-1, 0, NumV*0.1)
-		C0 = np.random.randint(0, 1, NumV*0.1)
-		C1 = np.random.randint(1, 2, NumV*0.8)		# the claims of sources
-		C2 = np.concatenate((C1, C0), axis=0)
-		C =  np.concatenate((C2, Cn), axis=0)   	# assertion
-		Cn1 =[]   # store the negative one
-		for i in range(NumV):
-			if C[i] == -1:
-				Cn1.append(i)
+		# Cn = np.random.randint(-1, 0, NumV*0.1)
+		# C0 = np.random.randint(0, 1, NumV*0.1)
+		# C1 = np.random.randint(1, 2, NumV*0.8)		# the claims of sources
+		# C2 = np.concatenate((C1, C0), axis=0)
+		# C =  np.concatenate((C2, Cn), axis=0)   	# assertion
+
 
 		ai = np.random.uniform(0.1,0.9,N)
 		bi = np.random.uniform(0.1,0.5,N)
@@ -42,30 +101,6 @@ for N in range(50, 110, 10):
 		fi = np.zeros(N)
 		gi = np.zeros(N)
 		d1, d0, dn1 = 0.6, 0.3, 0.1
-		Graph = np.zeros([N,N])
-
-		# ------------------------------------
-		# this function is to generate the graph
-		# ------------------------------------
-		while flg==1:
-			i = np.random.randint(0,N-5)
-			j = np.random.randint(i+1, N)
-			ele = 1
-			Graph[j][i] = ele		# column is the ancestor
-			if np.sum(sum(Graph))<=link:
-				flg = 1
-			else:
-				flg = 0
-
-		# establish the dict to find the dependency graph
-		for j in range(N):
-			G_row = Graph[j,:]  # get the rows
-			G_col = Graph[:,j]
-			for i in range(N):
-				if G_row[i]==1:		# get the column denote the ancestor
-					SD_ancestor.setdefault(j, []).append(i)	 	# get the list of ancestors
-				if G_col[i]==1:
-					SD_successor.setdefault(j, []).append(i)	# get the list of successors
 
 		SC = np.zeros([NumV,N])
 
@@ -96,21 +131,21 @@ for N in range(50, 110, 10):
 			for id in User:
 				SC[i,id] = 1
 
-		# -----Calculate the ratio of dependent sources---
-		ratio = dict()
-		for key, val in SD_ancestor.items():
-			child = key
-			parent = val
-			num_same = 0.0
-			num_par = 0.0
-			for k in parent:
-				Sg = SC[:,child]  # get the all the reports of child
-				Sp = SC[:,k]
-				num_bit = Sg.astype(int) & Sp.astype(int)  #convert to int for matrix
-				num_same = np.sum(num_bit) + num_same
-				num_par = np.sum(Sp) + num_par
+		# # -----Calculate the ratio of dependent sources---
+		# ratio = dict()
+		# for key, val in SD_ancestor.items():
+		# 	child = key
+		# 	parent = val
+		# 	num_same = 0.0
+		# 	num_par = 0.0
+		# 	for k in parent:
+		# 		Sg = SC[:,child]  # get the all the reports of child
+		# 		Sp = SC[:,k]
+		# 		num_bit = Sg.astype(int) & Sp.astype(int)  #convert to int for matrix
+		# 		num_same = np.sum(num_bit) + num_same
+		# 		num_par = np.sum(Sp) + num_par
 
-			ratio[key] = num_same/num_par	# the ratio is right
+		# 	ratio[key] = num_same/num_par	# the ratio is right
 
 		# we need to get the independent sources
 		Ind_Source =[]
@@ -121,7 +156,6 @@ for N in range(50, 110, 10):
 			else:
 				Ind_Source.append(i)	# get the independent sources
 
-		# print(Ind_Source)
 
 		parent_len = len(Ind_Source)
 		child_len = len(Dep_Source)
