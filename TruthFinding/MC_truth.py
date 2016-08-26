@@ -4,6 +4,7 @@ Function: TruthFinding paper based EM algorithm for Man claro
 '''
 import numpy as np
 import random
+import math
 
 # ------generate the graph-------
 # ------Fun: different graph--------
@@ -14,7 +15,7 @@ def Get_graph(N,ratio):
 		j = np.random.randint(0, i)
 		Graph[i][j] = 1		# column is the ancestor
 
-	for i in range(nr+1,2*nr):  	# dependent sources
+	for i in range(nr+1,3*nr):  	# dependent sources
 		j = np.random.randint(0, i)
 		Graph[i][j] = 1		
 
@@ -67,7 +68,7 @@ def Generate_SC(N,NumV,SD_successor,pct):   #sources'claims
 	# generate the claims of each observation
 	for j in range(NumV):
 		if C[j] > 0:
-			t = np.random.uniform(0.5,0.9)
+			t = np.random.uniform(0.4,0.9)
 			numt = int(N*t)   # number of SC = 1
 			SC1 = np.random.randint(1, 2, numt)	    # sc = 1
 			SC0 = np.random.randint(0, 1, N-numt)   # sc = 0 
@@ -76,7 +77,7 @@ def Generate_SC(N,NumV,SD_successor,pct):   #sources'claims
 			SC[j,:] = SC01
 		elif C[j] == 0:
 			# generate the false assertion and let SC=1
-			tn =  np.random.uniform(0.2,0.6)
+			tn =  np.random.uniform(0.1,0.7)
 			nt = int(N*tn)
 			SC3 = np.random.randint(1, 2, nt)
 			SC4 = np.random.randint(0, 1, N-nt)
@@ -136,7 +137,7 @@ def Fun_EM_Social(NumV,Ind_Source,Dep_Source,SC,Parameter):
 	d0 = 0.5
 	ik = 0
 	deta = 1
-	while deta>0.0000001:
+	while deta>math.pow(10,-8):
 		ik += 1
 		for j in range(NumV):
 			SCJ = SC[j,:]
@@ -165,13 +166,13 @@ def Fun_EM_Social(NumV,Ind_Source,Dep_Source,SC,Parameter):
 			# print(PZ1,PZ0)
 			Z1[j] = PZ1*d1/(PZ1*d1 + PZ0*d0)  # calculate the Zj for all the independent sources SC=1
 			if Z1[j] <0.000001:
-				Z1[j] = 0.0001
+				Z1[j] = 0.00001
 			if Z1[j] >0.999:
-				Z1[j] = 0.999
+				Z1[j] = 0.9999
 			Z0[j] = PZ0*d0/(PZ1*d1 + PZ0*d0)
 			if Z0[j]<0.000001:
-				Z0[j] = 0.0001
-			if Z0[j] >0.999:
+				Z0[j] = 0.00001
+			if Z0[j] >0.9999:
 				Z0[j] = 0.999
 
 		Z1_SC1_D0 = 0
@@ -239,10 +240,10 @@ def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id):
 	Z1 = np.zeros(NumV)
 	Z0  = np.zeros(NumV)
 	Zn1 = np.zeros(NumV)
-	d1, d0, dn1 = 0.5, 0.1, 0.4
+	d1, d0, dn1 = 0.5, 0.2, 0.3
 	ik = 0
 	deta = 1
-	while deta>np.exp(-20):
+	while deta>math.pow(10,-8):
 		ik += 1
 		for j in range(NumV):
 			SCJ = SC[j,:]
@@ -255,38 +256,44 @@ def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id):
 				else:
 					D = 0
 				if SCJ[i] ==1 and D == 0:
+					# print("ok")
 					PZ1 = PZ1*ai[i]
-					PZ0= PZ0*bi[i]
+					PZ0 = PZ0*bi[i]
 					PZn1 = PZn1*qi[j,i]		# find the first source to make the claims
 				elif SCJ[i] ==0 and D == 0:
 					PZ1= PZ1*(1-ai[i])
 					PZ0 = PZ0*(1-bi[i])
 					PZn1= PZn1*(1-qi[j,i])
+					# print("ok")
 				elif SCJ[i] ==1 and D == 1:
 					PZ1 = PZ1*fi[i]
 					PZ0 = PZ0*gi[i]
 					PZn1 = PZn1*hi[i]
+					# print("ok")
 				elif SCJ[i] ==0 and D == 1:
 					PZ1 = PZ1*(1-fi[i])
 					PZ0 = PZ0*(1-gi[i])
 					PZn1 = PZn1*(1-hi[i])
+					# print("ok")
 				else:
 					print("there is an error")
 			# print((PZ1*d1 + PZ0*d0+ PZn1*dn1))
 			# print(PZn1,PZ1,PZ0)
+					
+			print(PZn1,PZ0)
 			Z1[j] = PZ1*d1/(PZ1*d1 + PZ0*d0 + PZn1*dn1)  # calculate the Zj for all the independent sources SC=1
 			if Z1[j] <0.000001:
-				Z1[j] = 0.001
+				Z1[j] = 0.00001
 			if Z1[j] >0.999:
 				Z1[j] = 0.999
 			Z0[j] = PZ0*d0/(PZ1*d1 + PZ0*d0 + PZn1*dn1)
 			if Z0[j]<0.000001:
-				Z0[j] = 0.001
+				Z0[j] = 0.00001
 			if Z0[j] >0.999:
 				Z0[j] = 0.999
 			Zn1[j] = PZn1*dn1/(PZ1*d1 + PZ0*d0 + PZn1*dn1)
 			if Zn1[j]<0.000001:
-				Zn1[j] = 0.001
+				Zn1[j] = 0.00001
 			if Zn1[j] >0.999:
 				Zn1[j] = 0.999
 
@@ -357,21 +364,23 @@ def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id):
 # --------Main Function-------------
 accuray_EM =[]
 accuray_vote=[]
+accuray_social=[]
 itera = 1
-for N in range(120, 130, 10):
+for N in range(100, 120, 50):
 	rpt_EM = []
 	rpt_vote = []
+	rpt_social =[]
 	for mt in range(itera):  # the number of iteration
-		NumV = 60 	# number of variables
+		NumV = 80 	# number of variables
 		link = int(N*1)
 		pct = 0.7
 		ratio = 0.5  #dependent ratio
-		ai = np.random.uniform(0.3,0.9,N)
-		bi = np.random.uniform(0.1,0.5,N)
+		ai = np.random.uniform(0.5,0.9,N)
+		bi = np.random.uniform(0.2,0.5,N)
 		ai = np.round(ai*100)/100
 		bi = np.round(bi*100)/100
-		sfi = np.random.uniform(0.3,0.8,N)
-		sgi = np.random.uniform(0.1,0.5,N)
+		sfi = np.random.uniform(0.5,0.8,N)
+		sgi = np.random.uniform(0.2,0.5,N)
 		fi = np.round(sfi*100)/100
 		gi = np.round(sgi*100)/100
 
@@ -393,54 +402,70 @@ for N in range(120, 130, 10):
 		# ---we need to find the first users of each events
 		
 		qi = Get_qi(SC,NumV,N,Cn1,st_fst_id,ai)
-		hi = np.random.uniform(0.5,0.9,N)
+		hi = np.random.uniform(0.7,0.9,N)
+		hi = np.round(hi,decimals=3)
 		Parameter = np.vstack((ai,bi,fi,gi))  # parameters for EM algorithm
 		# --------Function:EM algorithm-------
 		# -------EM algorithm-----------
 		var_len = 2*parent_len + 3*child_len + 2
 		Z1, Z0, Zn1 = New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id) #new EM algorithms
 		EM_z1 = Fun_EM_Social(NumV,Ind_Source,Dep_Source,SC,Parameter)
-		print(EM_z1)
+		# print(EM_z1)
+		EM_SC = np.zeros(NumV)
+		for j in range(NumV):
+			if EM_z1[j] > 0.5:
+				EM_SC[j] = 1
+			else:
+				EM_SC[j] = 0
 		# ------statistic for true or false report---
-		Z_rst = np.zeros(NumV)-1
+		Z_rst = np.zeros(NumV)
 		Vote = np.zeros(NumV)
 		##---!!!notice, how to know the opinion?!!!-----
 		for j in range(NumV):
 			if Z1[j]>=0.5:
 				Z_rst[j] = 1
-			elif Z1[j]<0.5 and Z0[j] >= 0.5:
+			if Zn1[j] >= 0.5:
+				Z_rst[j] = -1
+			if Z0[j]>=0.5:
 				Z_rst[j] = 0
-
 
 		print("-----Z0 below is the prob of Z0----")
 		print(Z0)
 		print(C)
-		# print("-----Z1 below is the prob of Z1----")
+		print("-----Z1 below is the prob of Z1----")
 		print(Z1)
-		# print("-----below is the prob of opinion----")
-		# print(Zn1)
+		print("-----below is the prob of opinion----")
+		print(Zn1)
 		for k in range(NumV):
 			if np.sum(SC[k,:])>N/2:
 				Vote[k] = 1
-			elif np.sum(SC[k,:])<=N/2 and np.sum(SC[k,:])>10:
+			elif np.sum(SC[k,:])<=N/2 and np.sum(SC[k,:])>5:
 				Vote[k] = 0
 			else:
-				Vote[k] = -1
+				Vote[k] = 0
 
 		ML_num = 0
 		vote_num =0
+		socail_num = 0
 		for j in range(NumV):
 			if Z_rst[j] == C[j]:
 				ML_num += 1
 			if Vote[j] == C[j]:
 				vote_num += 1
+			if EM_SC[j] == C[j]:
+				socail_num += 1
 		rpt_EM.append(ML_num/NumV)
 		rpt_vote.append(vote_num/NumV)
+		rpt_social.append(socail_num/NumV)
 
 	mean_vote = np.mean(rpt_vote)
 	mean_EM = np.mean(rpt_EM)
+	mean_social = np.mean(rpt_social)
 	accuray_vote.append(mean_vote)
 	accuray_EM.append(mean_EM)
+	accuray_social.append(mean_social)
+
+	print(accuray_social,accuray_vote,accuray_EM)
 
 # fw = open('vote_accy_N.txt', 'w')
 # fw.write(str(accuray_vote))
@@ -453,5 +478,4 @@ for N in range(120, 130, 10):
 # print(accuray_EM)
 # for i in range(NumV):
 # 	print(SC[i,:])
-
 
