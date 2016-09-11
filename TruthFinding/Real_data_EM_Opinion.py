@@ -9,24 +9,72 @@ import random
 import math
 
 
+
+r0 = 0.1
+rn1 = 0.05
+r1 = 0.85
 #---this function is to get the reb of first sources to tweet
 def Get_qi(NumV,N,st_fst_id,ai):
 	qi = np.zeros([NumV,N])+0.01
-	all_fst_ids=[]  #for all the claims and assertions
+	# all_fst_ids=[]  #for all the assertions
 	for j in range(NumV):
-		ids = st_fst_id[j]
-		qi[j,ids] = ai[ids]
-		all_fst_ids.append(ids)
-
-	return qi, all_fst_ids
-
-
-def Get_graph(sc_rt):
-	SD_ancestor = []
-	SD_successor =[]
+		sids = st_fst_id[j]
+		qi[j,sids] = ai[sids]
+		# all_fst_ids.append(sids)
+	return qi
 
 
-	return SD_successor,SD_ancestor,st_fst_id
+def Get_graph(Src_num_dict):
+	fr_graph = open('Ancestor-children.txt','r')
+	fr_first = open('First_sources.txt','r')
+	SD_ancestor = dict()
+	# SD_successor =dict()
+	First_src = []
+	for lines in fr_graph.readlines():
+		par_child = lines.split()
+		father = Src_num_dict[par_child[0]]
+		child = Src_num_dict[par_child[1]]
+		# print(Src_num_dict['1'])
+		# SD_successor.setdefault(father,[]).append(child)
+		SD_ancestor.setdefault(child,[]).append(father)  #child:ancestors
+
+	for sources in fr_first.readlines():
+		ids = sources.split()
+		fid = Src_num_dict[ids[0]]
+		First_src.append(fid)
+
+	fr_graph.close()
+	fr_first.close()
+	# print(First_src)
+	return SD_ancestor,First_src
+
+def Get_Source_Claims():
+	uniq_src = []
+	Src_num_dict = dict()
+	Ass_src_dict = dict()
+	fr_SC = open('Source_claims.txt','r')
+	for line in fr_SC.readlines():
+		SClaim = line.split()
+		source = SClaim[0]
+		ass = SClaim[1]
+		Ass_src_dict.setdefault(ass,[]).append(source)
+		if source not in uniq_src:
+			uniq_src.append(source)
+
+	for j in range(len(uniq_src)):
+		Src_num_dict[uniq_src[j]] = j
+
+	V_num = len(Ass_src_dict.keys())
+	N = len(uniq_src)
+	SC = np.zeros([V_num,N])
+	for k in range(V_num):
+		nm = k+1
+		S_ids = Ass_src_dict[str(nm)]
+		for ids in S_ids:
+			num = Src_num_dict[ids]
+			SC[k,num] = 1
+			# print(k+1,num)
+	return SC,N,V_num,Src_num_dict
 
 #---EM-social algorithm-----
 def Fun_EM_Social(NumV,Ind_Source,Dep_Source,SC,Parameter):
@@ -130,7 +178,7 @@ def Fun_EM_Social(NumV,Ind_Source,Dep_Source,SC,Parameter):
 		deta = sum(deta/len(Theta))  # calculate the average error
 		Store_Theta =Theta
 		print("----it is running---")
-		if ik>=50:
+		if ik>=20:
 			print("it is terminated by k=50")
 			break
 
@@ -138,7 +186,7 @@ def Fun_EM_Social(NumV,Ind_Source,Dep_Source,SC,Parameter):
 
 
 #-----below is the new algorithms for opinion
-def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id,all_fst_ids):
+def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id):
 	ai,bi,fi,gi = Parameter[0],Parameter[1],Parameter[2],Parameter[3]
 	Store_Theta = np.zeros(var_len)  # Get the length of the variables
 	Z1 = np.zeros(NumV)
@@ -162,7 +210,7 @@ def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id,a
 					D = 1
 				else:
 					D = 0
-				if i == all_fst_ids[j]:
+				if i == st_fst_id[j]:
 					PZn1 = PZn1*qi[j,i]
 					flag = 1
 					# print("the number is ",j,i)
@@ -269,7 +317,7 @@ def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id,a
 		deta = sum(deta/len(Theta))  # calculate the average error
 		Store_Theta =Theta
 		print("----it is running---")
-		if ik>=50:
+		if ik>=20:
 			break
 			print("it is terminated by k")
 
@@ -278,37 +326,31 @@ def New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id,a
 
 
 ## ---------main_fun-----------
-accuray_EM =[]
-accuray_vote=[]
-accuray_social=[]
-itera = 50
-fr = open('.txt','r')
-for num,data in enumerate(fr):
-	pass
+EM_opinion =[]
+Voting=[]
+EM_social=[]
+itera = 1
 
-fr.close()
+SC, N, NumV,Src_num_dict = Get_Source_Claims()
+SD_ancestor,st_fst_id = Get_graph(Src_num_dict)
 
-
-for Nt in range(60, 70, 20):
-	rpt_EM = []
-	rpt_vote = []
-	rpt_social =[]
+# print(SD_ancestor)
+fr_voting = open('Voting_rst.txt','w')
+fr_EMsocial = open('EM_social_rst.txt','w')
+fr_opinionEM = open('EM_opinion_rst.txt','w')
+for Nt in range(1, 2, 2):
 	for mt in range(itera):  # the number of iteration
-		NumV = 50 	# number of variables
-		N = len(Source_ids)
 		#initialize the parameters------
-		ai = np.random.uniform(0.5,0.9,N)
-		bi = np.random.uniform(0.2,0.6,N)
+		ai = np.random.uniform(0.1,0.5,N)
+		bi = np.random.uniform(0.1,0.6,N)
 		ai = np.round(ai*100)/100
 		bi = np.round(bi*100)/100
-		sfi = np.random.uniform(0.5,0.8,N)
+		sfi = np.random.uniform(0.7,0.95,N)
 		sgi = np.random.uniform(0.2,0.6,N)
 		fi = np.round(sfi*100)/100
 		gi = np.round(sgi*100)/100
 
 		# we need to get the independent sources
-		SD_successor,SD_ancestor = Get_graph(social_relation)
-		st_fst_id = Get_TimeStamp()
 		Ind_Source =[]
 		Dep_Source =[]
 		for i in range(N):
@@ -320,7 +362,7 @@ for Nt in range(60, 70, 20):
 		parent_len = len(Ind_Source)
 		child_len = len(Dep_Source)
 		
-		qi, all_fst_ids = Get_qi(NumV,N,st_fst_id,ai)
+		qi = Get_qi(NumV,N,st_fst_id,ai)
 		hi = np.random.uniform(0.6,0.8,N)
 		hi = np.round(hi,decimals=3)
 		Parameter = np.vstack((ai,bi,fi,gi))  # parameters for EM algorithm
@@ -329,7 +371,7 @@ for Nt in range(60, 70, 20):
 		var_len = 2*parent_len + 3*child_len + 2
 		Z1, Z0, Zn1 = New_fun_EM(var_len,NumV,Ind_Source,Dep_Source,SC,Parameter,qi,hi,st_fst_id) #new EM algorithms
 		EM_z1 = Fun_EM_Social(NumV,Ind_Source,Dep_Source,SC,Parameter)
-		print(EM_z1)
+		# print(EM_z1)
 		EM_SC = np.zeros(NumV)
 		for j in range(NumV):
 			if EM_z1[j] >= 0.5:
@@ -349,51 +391,30 @@ for Nt in range(60, 70, 20):
 				Z_rst[j] = 0
 
 		# print("-----Z0 below is the prob of Z0----")
-		# print(Z0)
-		print(C)
+		print(Z0)
+		# print(C)
 		# print(np.sum(SC,axis=1))  #calculate the rows
-		# print("-----Z1 below is the prob of Z1----")
-		# print(Z1)
+		print("-----Z1 below is the prob of Z1----")
+		print(Z1)
 		# print("-----below is the prob of opinion----")
-		# print(Zn1)
+		print(Z_rst)
 		for k in range(NumV):
-			if np.sum(SC[k,:])>N/2:
+			if np.sum(SC[k,:])>N/10:
 				Vote[k] = 1
-			elif np.sum(SC[k,:])<=N/2 and np.sum(SC[k,:])>=N*0.05:
+			elif np.sum(SC[k,:])<=N/10 and np.sum(SC[k,:])>=N*0.005:
 				Vote[k] = 0
 			else:
 				Vote[k] = -1
 
-		ML_num = 0
-		vote_num =0
-		socail_num = 0
-		for j in range(NumV):
-			if Z_rst[j] == C[j]:
-				ML_num += 1
-			if Vote[j] == C[j]:
-				vote_num += 1
-			if EM_SC[j] == C[j]:
-				socail_num += 1
-		rpt_EM.append(ML_num/NumV)
-		rpt_vote.append(vote_num/NumV)
-		rpt_social.append(socail_num/NumV)
-
-	mean_vote = np.mean(rpt_vote)
-	mean_EM = np.mean(rpt_EM)
-	mean_social = np.mean(rpt_social)
-	mean_vote=np.round(mean_vote,decimals=3)
-	mean_EM=np.round(mean_EM,decimals=3)
-	mean_social = np.round(mean_social,decimals=3)
-
-
-	accuray_vote.append(mean_vote)
-	accuray_EM.append(mean_EM)
-	accuray_social.append(mean_social)
-
-
-print(accuray_social,accuray_vote,accuray_EM)
-
-
+	# -----get the iteration results-------
+		fr_EMsocial.write(str(EM_SC)+'\n')
+		fr_voting.write(str(Vote)+'\n')
+		fr_opinionEM.write(str(Z_rst)+'\n')
 
 # if __name__ == '__main__':
 # 	Fun_main()
+
+fr_voting.close()
+fr_EMsocial.close()
+fr_opinionEM.close()
+print("Congratulations, work is done")
