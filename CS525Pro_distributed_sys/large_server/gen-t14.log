@@ -1,0 +1,13 @@
+2016-04-25 10:37:00,011 - __main__ - INFO - 0 
+  catcachestats.php: stats: h=38591533  m=5868505
+ 1461598620.011364
+2016-04-25 10:44:46,881 - __main__ - INFO - 10 
+  catcachestats.php: stats: h=38622705  m=5882333
+ 1461599086.881155
+2016-04-25 10:49:52,463 - __main__ - INFO - 12 
+  catcachestats.php: stats: h=38647182  m=5893176
+ 1461599392.463711
+2016-04-25 10:54:32,967 - __main__ - INFO - 14 
+  catcachestats.php: stats: h=38673356  m=5904702
+ 1461599672.9671781
+2016-04-25 10:54:32,971 - __main__ - INFO - 63 out of while FINISH. t14
