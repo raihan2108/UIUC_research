@@ -4,7 +4,6 @@ Fun: voting for MURI project about influence
 graph of social sensing
 '''
 
-
 import numpy as np
 # from math import factorial
 from copy import deepcopy
@@ -40,6 +39,35 @@ def Hfun_reb(cost, new_price, k, n):
 					else:
 						st_num = list(range(0,k-1))
 	return st_num
+
+
+def Generate_SC(N,NumV,id_rank):   #sources'claims
+	t = NumV*pr
+	SC = np.zeros([NumV,N])	#assertion and number of variables
+	C0 = np.random.randint(0, 1, t)
+	C1 = np.random.randint(1, 2, NumV-t)
+	C = np.hstack((C1,C0))
+	random.shuffle(C)
+	# generate the claims of each observation
+	for j in range(NumV):
+		if C[j] ==1:
+			t = np.random.uniform(0.4,0.9)
+			numt = int(N*t)   # number of SC = 1
+			SC1 = np.random.randint(1, 2, numt)	    # sc = 1
+			SC0 = np.random.randint(0, 1, N-numt)   # sc = 0 
+			SC01 = np.concatenate((SC0,SC1))
+			random.shuffle(SC01)
+			SC[j,:] = SC01
+		else:
+			# generate the false assertion and let SC=1
+			tn =  np.random.uniform(0.2,0.7)
+			nt = int(N*tn)
+			SC3 = np.random.randint(1, 2, nt)
+			SC4 = np.random.randint(0, 1, N-nt)
+			SC34 = np.concatenate((SC4,SC3))
+			random.shuffle(SC34)
+			SC[j,:] = SC34
+
 
 
 def fun_reb(Ran,Rbn):
@@ -80,43 +108,30 @@ def cost_only(Ra,Rb,Fee,cost):
 		else:
 			break
 
-	cost_err = voting_reb()
+	cost_err = fun_voting
 
 	return cost_err
 
-# #the below is the crowdbudget algorithm---
 
 
-## I should generate the graph based on the ''reliability of sources''
-def Generate_graph(n,nk):   # generate random graph!!
-	flag = 1
-	Amtx = np.zeros([n,n])
-	links = nk*n
-	while flag==1:
-		i = np.random.randint(0,n-5)
-		j = np.random.randint(i+1,n)
-		ele = 1
-		Amtx[i,j]=ele
-		if np.sum(Amtx)<=links:
-			flag = 1
-		else:
-			flag = 0
 
-	# establish the dict to find the dependency graph
-	SD_ancestor = dict()
-	SD_successor = dict()
+def Sort_abi(ai,bi):
+	dict_ai = dict()
+	id_list = []
+	# dict_bi = dict()
+	rk_ai = sorted(ai,reverse=True)
+	# print(rk_ai)
+	rk_bi = np.sort(bi)
+	new_bi = np.zeros(len(bi))
 	for i in range(n):
-		G_row = Amtx[i,:]  # get the rows
-		G_col = Amtx[:,i]
-		for j in range(n):
-			if G_row[j]==1:		# get the column denote the ancestor
-				SD_successor.setdefault(i, []).append(j)	# list of children [id:children]]
-			if G_col[j]==1:
-				SD_ancestor.setdefault(i, []).append(j)	# list of ancestors [id: ancestors]
+		dict_ai[ai[i]] = i
+	for k in range(n):
+		key = rk_ai[k]   # get the key of ai
+		ids = dict_ai[key]
+		new_bi[ids] = rk_bi[k]
+		id_list.append(ids)
 
-	return SD_ancestor
-
-
+	return new_bi,id_list
 
 #-----below is the main function to compare with the baselines
 rst_err1 = []
@@ -129,20 +144,23 @@ for mt in range(0,M):
 	arr_err2 = []
 	arr_err3 = []
 	arr_err4 = []
+	Assertion = np.random.uniform(0,2,)
 	for n in range(50,110,10):
 		ai = np.random.uniform(0.4,0.9,n)
 		bi = np.random.uniform(0.1,0.3,n)
 		ai = np.around(ai*1000)/1000
 		bi = np.around(bi*1000)/1000
 		pr = np.random.uniform(1, 5, n)  # the prices for each source
+		pr = np.around(pr,decimals=3)
+		bi,id_rank = Sort_abi(ai,bi)
 
 		# ---below fun: store the [ai, id]
 		dict_ai = dict()
 		dict_bi = dict()
 		dict_pr = dict()
 		for i in range(n):
-			dict_ai[ai[i]] = i
-			dict_bi[i] = bi[i]  	# store [id: bi]
+			# dict_ai[ai[i]] = i
+			# dict_bi[i] = bi[i]  	# store [id: bi]
 			dict_pr[pr[i]] = i
 		S_ai = deepcopy(ai)  # save the original reliability
 		S_bi = deepcopy(bi)
@@ -163,7 +181,7 @@ for mt in range(0,M):
 		Pa = ai
 		Pb = bi
 		# --#function is to generate the Matrix graph ------
-		SD_ancestor = Generate_graph(n,nk)
+		SD_ancestor = Generate_graph(n,nk,id_rank)
 		#---------------------
 		for s in range(n):
 			if s in SD_ancestor.keys():
