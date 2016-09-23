@@ -115,7 +115,7 @@ def Fun_voting(st_num,SC,NumV,C):
 
 	return accy
 ###-----huristic function----
-def Hfun_reb(cost, new_price, n,C):
+def Hfun_reb(cost,new_price,n,C,ID_dict):
 	st_num = []
 	sum_fee = 0
 	k = 5
@@ -125,8 +125,9 @@ def Hfun_reb(cost, new_price, n,C):
 		if k > n:
 			break
 
-	st_num = list(range(0,k))
-	reb_accy= Fun_voting(st_num,SC,NumV,C)
+	# st_num = list(range(0,k))
+	nums = [ID_dict[i] for i in range(k)]
+	reb_accy = Fun_voting(nums,SC,NumV,C)
 
 	return reb_accy
 
@@ -168,7 +169,6 @@ def cost_only(SC,Fee,cost,C):
 	return cost_accy
 
 
-
 def Sort_abi(ai,bi):
 	dict_ai = dict()
 	id_list = []
@@ -200,12 +200,12 @@ for mt in range(0,M):
 	arr_err3 = []
 	# arr_err4 = []
 	# Assertion = np.random.uniform(0,2,)
-	for n in range(50,110,10):
+	for n in range(80,120,10):
 		ai = np.random.uniform(0.4,0.9,n)
 		bi = np.random.uniform(0.1,0.3,n)
 		ai = np.around(ai*1000)/1000
 		bi = np.around(bi*1000)/1000
-		pr = np.random.uniform(1, 5, n)  # the prices for each source
+		pr = np.random.uniform(1,5, n)  # the prices for each source
 		pr = np.around(pr,decimals=3)
 		bi,id_rank = Sort_abi(ai,bi)
 
@@ -260,6 +260,10 @@ for mt in range(0,M):
 
 		Rab = np.sort(Hurist_rab)  # get the most reliable sources
 		Rab = sorted(Rab, reverse=True)   #get the descending order
+		ID_dict = dict()
+		for rk in range(n):
+			ids = rab_dict[Rab[rk]]
+			ID_dict[rk] = ids
 
 		# -------sort the reliability based on the hurisctic rab-----
 		# then we get the highest reb to lowest in order
@@ -297,7 +301,7 @@ for mt in range(0,M):
 		#------------------------------------------------
 		#  Here begin to calculate the error of our method
 		#  -----------------------------------------------
-		reb_accy = Hfun_reb(cost, new_price, n,C)
+		reb_accy = Hfun_reb(cost, new_price,n,C,ID_dict)
 
 		# errors for the baselines
 		rand_accy = rand_fun(NumV,SC,cost,prc,C)   #same as the RA,RB in the Matlab codes
