@@ -15,30 +15,35 @@ w2 = 0.8
 nk = 2
 w = 0.8
 cost = 60
-M= 15	# Ma Carlo
-
+M= 15		# Ma Carlo = 15
+NumV = 60
 
 #----define the huristic alg based on the reliability
 # to choose the sources
-def Hfun_reb(cost, new_price, k, n):
-	st_num = []
-	if np.sum(new_price[0:k+1]) <= cost:  # e.g k=3 there are 4 numbers
-		st_num = list(range(0,k+1))
-	elif np.sum(new_price[0:k]) <= cost:
-		for j in range(k+1, n):
-			Sum_cost = np.sum(new_price[0:k]) + new_price[j]
-			if Sum_cost <= cost:
-				st_num = list(range(0,k))
-				st_num.append(j)
-			else:
-				if j < n-1:
-					Sum_cost = np.sum(new_price[0:k-1]) + new_price[j] + new_price[j+1]
-					if Sum_cost<cost:
-						st_num = list(range(0,k-1))
-						st_num.extend([j, j+1])
-					else:
-						st_num = list(range(0,k-1))
-	return st_num
+
+def Get_graph(N):
+	nr = int(N*0.25)
+	Graph = np.zeros([N,N])
+	for i in range(1,nr):  	# dependent sources
+		j = np.random.randint(0, i)
+		Graph[i][j] = 1		# column is the ancestor
+
+	for i in range(nr+1,2*nr):  	# dependent sources
+		j = np.random.randint(0, i)
+		Graph[i][j] = 1
+
+	SD_ancestor = dict()   	# source graph dictionary	
+	SD_successor = dict()
+	for j in range(N):
+		G_row = Graph[j,:]  # get the rows
+		G_col = Graph[:,j]
+		for i in range(N):
+			if G_row[i]==1:		# get the column denote the ancestor
+				SD_ancestor.setdefault(j, []).append(i)	 	# get the list of ancestors
+			# if G_col[i]==1:
+			# 	SD_successor.setdefault(j, []).append(i)	# get the list of successors
+
+	return SD_ancestor
 
 
 def Generate_SC(N,NumV,id_rank):   #sources'claims
@@ -48,15 +53,21 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 	C1 = np.random.randint(1, 2, NumV-t)
 	C = np.hstack((C1,C0))
 	random.shuffle(C)
+	top = int(N*0.3)
+	Top_rank = id_rank[0:top]
 	# generate the claims of each observation
 	for j in range(NumV):
 		if C[j] ==1:
-			t = np.random.uniform(0.4,0.9)
+			t = np.random.uniform(0.3,0.9)
 			numt = int(N*t)   # number of SC = 1
 			SC1 = np.random.randint(1, 2, numt)	    # sc = 1
 			SC0 = np.random.randint(0, 1, N-numt)   # sc = 0 
 			SC01 = np.concatenate((SC0,SC1))
 			random.shuffle(SC01)
+			for k in Top_rank:
+				bull = np.around(np.random.random()+0.3)
+				SC01[k] = int(bull)
+
 			SC[j,:] = SC01
 		else:
 			# generate the false assertion and let SC=1
@@ -66,12 +77,47 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 			SC4 = np.random.randint(0, 1, N-nt)
 			SC34 = np.concatenate((SC4,SC3))
 			random.shuffle(SC34)
+			for kk in Top_rank:
+				bull = np.around(np.random.random()-0.3)
+				SC34[kk] = int(bull)
+
 			SC[j,:] = SC34
 
+	return SC
+
+###-----huristic function----
+def Hfun_reb(cost, new_price, n):
+	st_num = []
+	sum_fee = 0
+	k = 5
+	while sum_fee <= cost:
+		sum_fee = np.sum(new_price[0:k])
+		k += 1
+		if k > n:
+			break
+
+	st_num = list(range(0,k))
+
+	return st_num
 
 
-def fun_reb(Ran,Rbn):
-	
+##----voting based on the sorted reliability
+def Fun_voting(st_num,SC,NumV):
+	num_src = len(st_num)
+	passvoting_reb(st_num,SC):
+	SC_new = []
+	for j in st_num:
+		SCJ = SC[:,j]
+		lst = SCJ.tolist()
+		SC_new.extend([lst])
+		SC_arr = np.asarray(SC_new)
+		SC_final = np.transpose(SC_arr)
+
+	for i in range(NumV):
+		SCi = SC_final[i,:]
+		sum_sc = sum(SCi) > num_src
+
+	return SC_final
 
 
 # define the random function
@@ -96,8 +142,8 @@ def rand_fun(N,SC,cost,prc):
 
 
 # define function: cost-only
-
-def cost_only(Ra,Rb,Fee,cost):
+# cost_only(ct,cost,SC)
+def cost_only(SC,Fee,cost):
 	Psum = 0
 	N = len(Fee)
 	nums = []
@@ -111,7 +157,6 @@ def cost_only(Ra,Rb,Fee,cost):
 	cost_err = fun_voting
 
 	return cost_err
-
 
 
 
@@ -133,18 +178,19 @@ def Sort_abi(ai,bi):
 
 	return new_bi,id_list
 
+
 #-----below is the main function to compare with the baselines
 rst_err1 = []
 rst_err2 = []
 rst_err3 = []
-rst_err4 = []
+# rst_err4 = []
 for mt in range(0,M):
 	print("running time is", mt)
 	arr_err1 = []
 	arr_err2 = []
 	arr_err3 = []
-	arr_err4 = []
-	Assertion = np.random.uniform(0,2,)
+	# arr_err4 = []
+	# Assertion = np.random.uniform(0,2,)
 	for n in range(50,110,10):
 		ai = np.random.uniform(0.4,0.9,n)
 		bi = np.random.uniform(0.1,0.3,n)
@@ -159,9 +205,8 @@ for mt in range(0,M):
 		dict_bi = dict()
 		dict_pr = dict()
 		for i in range(n):
-			# dict_ai[ai[i]] = i
-			# dict_bi[i] = bi[i]  	# store [id: bi]
 			dict_pr[pr[i]] = i
+
 		S_ai = deepcopy(ai)  # save the original reliability
 		S_bi = deepcopy(bi)
 		s_prc = deepcopy(pr)
@@ -181,7 +226,8 @@ for mt in range(0,M):
 		Pa = ai
 		Pb = bi
 		# --#function is to generate the Matrix graph ------
-		SD_ancestor = Generate_graph(n,nk,id_rank)
+		SD_ancestor = Get_graph(n)
+		SC = Generate_SC(n,NumV,id_rank)
 		#---------------------
 		for s in range(n):
 			if s in SD_ancestor.keys():
@@ -242,39 +288,32 @@ for mt in range(0,M):
 		#------------------------------------------------
 		#  Here begin to calculate the error of our method
 		#  -----------------------------------------------
-		for k in range(2, nm):
-			st_num = Hfun_reb(cost, new_price, k, n)
-			Ran = []
-			Rbn = []
-			ppr = []
-			if len(st_num) > 0:
-				for j in range(len(st_num)):
-					ids = st_num[j]
-					Ran.append(new_Ra[ids])
-					Rbn.append(new_Rb[ids])
-					ppr.append(new_price[ids])
+		st_num = Hfun_reb(cost, new_price, n)
+		Ran = []
+		Rbn = []
+		ppr = []
+		if len(st_num) > 0:
+			for j in range(len(st_num)):
+				ids = st_num[j]
+				Ran.append(new_Ra[ids])
+				Rbn.append(new_Rb[ids])
+				ppr.append(new_price[ids])
 
-				err1 = voting_reb(Ran,Rbn)
-				if err1 < min_err1:
-					min_err1 = err1
-					crowd_price = ppr
-					crowd_ai = Ran
-					crowd_bi = Rbn
+			err1 = voting_reb(st_num,SC)
+			if err1 < min_err1:
+				min_err1 = err1
 
 		# errors for the baselines
 		err2 = rand_fun(n,SC,cost,new_price)   #same as the RA,RB in the Matlab codes
-		err3 = cost_only(Ra_prc,Rb_prc,ct,cost)
-		# err4 = crowdbudget(crowd_price,cost,crowd_ai, crowd_bi)
+		err3 = cost_only(ct,cost,SC)
 
 		arr_err1.append(min_err1)
 		arr_err2.append(err2)
 		arr_err3.append(err3)
-		# arr_err4.append(err4)
 
 	rst_err1.append(arr_err1)
 	rst_err2.append(arr_err2)
 	rst_err3.append(arr_err3)
-	# rst_err4.append(arr_err4)
 
 #-------------------------------------
 # ----calculat the mean values---
@@ -283,8 +322,7 @@ for mt in range(0,M):
 Err1 = np.mean(rst_err1,axis=0)
 Err2 = np.mean(rst_err2,axis=0)
 Err3 = np.mean(rst_err3,axis=0)
-# Err4 = np.mean(rst_err4,axis=0)
+
 print(Err1)
 print(Err2)
 print(Err3)
-# print(Err4)
