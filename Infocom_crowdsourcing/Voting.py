@@ -83,10 +83,39 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 
 			SC[j,:] = SC34
 
-	return SC
+	return SC,C
 
+
+##----voting based on the sorted reliability
+def Fun_voting(st_num,SC,NumV,C):
+	Claims = []
+	num_src = len(st_num)
+	passvoting_reb(st_num,SC):
+	SC_new = []
+	count = 0
+	for j in st_num:
+		SCJ = SC[:,j]
+		lst = SCJ.tolist()
+		SC_new.extend([lst])
+		SC_arr = np.asarray(SC_new)
+		SC_final = np.transpose(SC_arr)
+
+	for i in range(NumV):
+		SCi = SC_final[i,:]
+		sum_sc = sum(SCi)
+		if sum_sc > num_src/2:
+			Claims.append(1)
+		else:
+			Claims.append(0)
+
+	for j in range(len(Claims)):
+		if Claims[j] == C[j]:
+			count += 1
+	accy = count/NumV
+
+	return accy
 ###-----huristic function----
-def Hfun_reb(cost, new_price, n):
+def Hfun_reb(cost, new_price, n,C):
 	st_num = []
 	sum_fee = 0
 	k = 5
@@ -97,31 +126,13 @@ def Hfun_reb(cost, new_price, n):
 			break
 
 	st_num = list(range(0,k))
+	reb_accy= Fun_voting(st_num,SC,NumV,C)
 
-	return st_num
-
-
-##----voting based on the sorted reliability
-def Fun_voting(st_num,SC,NumV):
-	num_src = len(st_num)
-	passvoting_reb(st_num,SC):
-	SC_new = []
-	for j in st_num:
-		SCJ = SC[:,j]
-		lst = SCJ.tolist()
-		SC_new.extend([lst])
-		SC_arr = np.asarray(SC_new)
-		SC_final = np.transpose(SC_arr)
-
-	for i in range(NumV):
-		SCi = SC_final[i,:]
-		sum_sc = sum(SCi) > num_src
-
-	return SC_final
+	return reb_accy
 
 
 # define the random function
-def rand_fun(N,SC,cost,prc):
+def rand_fun(NumV,SC,cost,prc,C):
 	Psum = 0
 	Num = []
 	Rai = []
@@ -134,16 +145,14 @@ def rand_fun(N,SC,cost,prc):
 			Psum += prc[ids]
 			Num.append(ids)
 
-	for ids in Num:
+	rand_accy = Fun_voting(Num,SC,NumV,C)
 
-
-
-	return rand_err
+	return rand_accy
 
 
 # define function: cost-only
 # cost_only(ct,cost,SC)
-def cost_only(SC,Fee,cost):
+def cost_only(SC,Fee,cost,C):
 	Psum = 0
 	N = len(Fee)
 	nums = []
@@ -154,9 +163,9 @@ def cost_only(SC,Fee,cost):
 		else:
 			break
 
-	cost_err = fun_voting
+	cost_accy = Fun_voting(nums,SC,NumV,C)
 
-	return cost_err
+	return cost_accy
 
 
 
@@ -227,7 +236,7 @@ for mt in range(0,M):
 		Pb = bi
 		# --#function is to generate the Matrix graph ------
 		SD_ancestor = Get_graph(n)
-		SC = Generate_SC(n,NumV,id_rank)
+		SC,C = Generate_SC(n,NumV,id_rank)
 		#---------------------
 		for s in range(n):
 			if s in SD_ancestor.keys():
@@ -288,24 +297,11 @@ for mt in range(0,M):
 		#------------------------------------------------
 		#  Here begin to calculate the error of our method
 		#  -----------------------------------------------
-		st_num = Hfun_reb(cost, new_price, n)
-		Ran = []
-		Rbn = []
-		ppr = []
-		if len(st_num) > 0:
-			for j in range(len(st_num)):
-				ids = st_num[j]
-				Ran.append(new_Ra[ids])
-				Rbn.append(new_Rb[ids])
-				ppr.append(new_price[ids])
-
-			err1 = voting_reb(st_num,SC)
-			if err1 < min_err1:
-				min_err1 = err1
+		reb_accy = Hfun_reb(cost, new_price, n,C)
 
 		# errors for the baselines
-		err2 = rand_fun(n,SC,cost,new_price)   #same as the RA,RB in the Matlab codes
-		err3 = cost_only(ct,cost,SC)
+		rand_accy = rand_fun(NumV,SC,cost,prc,C)   #same as the RA,RB in the Matlab codes
+		cost_accy = cost_only(SC,Fee,cost,C)
 
 		arr_err1.append(min_err1)
 		arr_err2.append(err2)
@@ -319,9 +315,9 @@ for mt in range(0,M):
 # ----calculat the mean values---
 # ------------------------------------
 
-Err1 = np.mean(rst_err1,axis=0)
-Err2 = np.mean(rst_err2,axis=0)
-Err3 = np.mean(rst_err3,axis=0)
+Accy1 = np.mean(rst_err1,axis=0)
+Accy2 = np.mean(rst_err2,axis=0)
+Accy3 = np.mean(rst_err3,axis=0)
 
 print(Err1)
 print(Err2)
