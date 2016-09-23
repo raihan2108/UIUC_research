@@ -1,13 +1,14 @@
 '''
 Huajie Shao@09/20/2016
 Fun: voting for MURI project about influence
-graph of social sensing
+graph in social sensing
 '''
 
 import numpy as np
 # from math import factorial
 from copy import deepcopy
 import sys
+import random
 
 
 w1 = 0.3
@@ -17,6 +18,7 @@ w = 0.8
 cost = 60
 M= 15		# Ma Carlo = 15
 NumV = 60
+p = 0.6
 
 #----define the huristic alg based on the reliability
 # to choose the sources
@@ -47,13 +49,14 @@ def Get_graph(N):
 
 
 def Generate_SC(N,NumV,id_rank):   #sources'claims
-	t = NumV*pr
+	# print(N)
+	t = int(NumV*p)
 	SC = np.zeros([NumV,N])	#assertion and number of variables
 	C0 = np.random.randint(0, 1, t)
 	C1 = np.random.randint(1, 2, NumV-t)
 	C = np.hstack((C1,C0))
 	random.shuffle(C)
-	top = int(N*0.3)
+	top = int(N*0.1)
 	Top_rank = id_rank[0:top]
 	# generate the claims of each observation
 	for j in range(NumV):
@@ -71,7 +74,7 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 			SC[j,:] = SC01
 		else:
 			# generate the false assertion and let SC=1
-			tn =  np.random.uniform(0.2,0.7)
+			tn =  np.random.uniform(0.2,0.8)
 			nt = int(N*tn)
 			SC3 = np.random.randint(1, 2, nt)
 			SC4 = np.random.randint(0, 1, N-nt)
@@ -90,7 +93,7 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 def Fun_voting(st_num,SC,NumV,C):
 	Claims = []
 	num_src = len(st_num)
-	passvoting_reb(st_num,SC):
+	print(num_src)
 	SC_new = []
 	count = 0
 	for j in st_num:
@@ -133,7 +136,7 @@ def Hfun_reb(cost,new_price,n,C,ID_dict):
 
 
 # define the random function
-def rand_fun(NumV,SC,cost,prc,C):
+def rand_fun(NumV,SC,cost,prc,C,N):
 	Psum = 0
 	Num = []
 	Rai = []
@@ -205,7 +208,7 @@ for mt in range(0,M):
 		bi = np.random.uniform(0.1,0.3,n)
 		ai = np.around(ai*1000)/1000
 		bi = np.around(bi*1000)/1000
-		pr = np.random.uniform(1,5, n)  # the prices for each source
+		pr = np.random.uniform(1,2, n)  # the prices for each source
 		pr = np.around(pr,decimals=3)
 		bi,id_rank = Sort_abi(ai,bi)
 
@@ -215,6 +218,8 @@ for mt in range(0,M):
 		dict_pr = dict()
 		for i in range(n):
 			dict_pr[pr[i]] = i
+			dict_ai[ai[i]] = i
+			dict_bi[i] = bi[i]  
 
 		S_ai = deepcopy(ai)  # save the original reliability
 		S_bi = deepcopy(bi)
@@ -294,22 +299,20 @@ for mt in range(0,M):
 		while psum <= cost:
 			nm += 1
 			psum += ct[nm]
-		nm = nm-1   # get the max numbers of sources to report
-		min_err1 = 1
-
-
+		# nm = nm-1   # get the max numbers of sources to report
+		# min_err1 = 1
 		#------------------------------------------------
 		#  Here begin to calculate the error of our method
 		#  -----------------------------------------------
-		reb_accy = Hfun_reb(cost, new_price,n,C,ID_dict)
+		reb_accy = Hfun_reb(cost,new_price,n,C,ID_dict)
 
 		# errors for the baselines
-		rand_accy = rand_fun(NumV,SC,cost,prc,C)   #same as the RA,RB in the Matlab codes
-		cost_accy = cost_only(SC,Fee,cost,C)
+		rand_accy = rand_fun(NumV,SC,cost,s_prc,C,n)   #same as the RA,RB in the Matlab codes
+		cost_accy = cost_only(SC,ct,cost,C)
 
-		arr_err1.append(min_err1)
-		arr_err2.append(err2)
-		arr_err3.append(err3)
+		arr_err1.append(reb_accy)
+		arr_err2.append(rand_accy)
+		arr_err3.append(cost_accy)
 
 	rst_err1.append(arr_err1)
 	rst_err2.append(arr_err2)
@@ -319,10 +322,10 @@ for mt in range(0,M):
 # ----calculat the mean values---
 # ------------------------------------
 
-Accy1 = np.mean(rst_err1,axis=0)
-Accy2 = np.mean(rst_err2,axis=0)
-Accy3 = np.mean(rst_err3,axis=0)
+Reb_Accy1 = np.mean(rst_err1,axis=0)
+Rand_Accy2 = np.mean(rst_err2,axis=0)
+Cost_Accy3 = np.mean(rst_err3,axis=0)
 
-print(Err1)
-print(Err2)
-print(Err3)
+print(Reb_Accy1)
+print(Rand_Accy2)
+print(Cost_Accy3)

@@ -293,7 +293,7 @@ for mt in range(0,M):
 		new_price = np.zeros(n)
 		for j in range(n):
 			abi = Rab[j]
-			ids = rab_dict[abi]
+			ids = rab_dict[abi]  #org price
 			new_price[j] = pr[ids]
 			new_Ra[j] = ai[ids]
 			new_Rb[j] = bi[ids]
