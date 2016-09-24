@@ -10,27 +10,23 @@ from copy import deepcopy
 import sys
 import random
 
-
-w1 = 0.3
-w2 = 0.8
 nk = 2
-w = 0.8
 cost = 60
-M= 15		# Ma Carlo = 15
+M= 50		# Ma Carlo = 15
 NumV = 60
+n = 80
 p = 0.6
 
 #----define the huristic alg based on the reliability
 # to choose the sources
 
-def Get_graph(N):
-	nr = int(N*0.25)
+def Get_graph(N,ratio):
+	nr = int(N*(1-ratio))
 	Graph = np.zeros([N,N])
-	for i in range(1,nr):  	# dependent sources
-		j = np.random.randint(0, i)
-		Graph[i][j] = 1		# column is the ancestor
-
-	for i in range(nr+1,2*nr):  	# dependent sources
+	# for i in range(1,nr):  	# dependent sources
+	# 	j = np.random.randint(0, i)
+	# 	Graph[i][j] = 1		# column is the ancestor
+	for i in range(nr+1,N):  	# dependent sources
 		j = np.random.randint(0, i)
 		Graph[i][j] = 1
 
@@ -42,13 +38,13 @@ def Get_graph(N):
 		for i in range(N):
 			if G_row[i]==1:		# get the column denote the ancestor
 				SD_ancestor.setdefault(j, []).append(i)	 	# get the list of ancestors
-			# if G_col[i]==1:
-			# 	SD_successor.setdefault(j, []).append(i)	# get the list of successors
+			if G_col[i]==1:
+				SD_successor.setdefault(j, []).append(i)	# get the list of successors
 
-	return SD_ancestor
+	return SD_ancestor,SD_successor
 
 
-def Generate_SC(N,NumV,id_rank):   #sources'claims
+def Generate_SC(N,NumV,id_rank,SD_successor):   #sources'claims
 	# print(N)
 	t = int(NumV*p)
 	SC = np.zeros([NumV,N])	#assertion and number of variables
@@ -56,7 +52,7 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 	C1 = np.random.randint(1, 2, NumV-t)
 	C = np.hstack((C1,C0))
 	random.shuffle(C)
-	top = int(N*0.1)
+	top = int(N*0.2)
 	Top_rank = id_rank[0:top]
 	# generate the claims of each observation
 	for j in range(NumV):
@@ -86,6 +82,15 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 
 			SC[j,:] = SC34
 
+	for i in range(NumV):
+		for j in range(n):
+			if j in SD_successor.keys():
+				child = SD_successor[j]
+				for cd in child:
+					cout = np.random.randint(0,100,1)
+					if cout >= 30:
+						SC[i,cd] = SC[i,j]
+
 	return SC,C
 
 
@@ -93,7 +98,7 @@ def Generate_SC(N,NumV,id_rank):   #sources'claims
 def Fun_voting(st_num,SC,NumV,C):
 	Claims = []
 	num_src = len(st_num)
-	print(num_src)
+	# print(num_src)
 	SC_new = []
 	count = 0
 	for j in st_num:
@@ -111,7 +116,7 @@ def Fun_voting(st_num,SC,NumV,C):
 		else:
 			Claims.append(0)
 
-	for j in range(len(Claims)):
+	for j in range(NumV):
 		if Claims[j] == C[j]:
 			count += 1
 	accy = count/NumV
@@ -156,10 +161,11 @@ def rand_fun(NumV,SC,cost,prc,C,N):
 
 # define function: cost-only
 # cost_only(ct,cost,SC)
-def cost_only(SC,Fee,cost,C):
+def cost_only(SC,Fee,cost,C,prc_ids_dict):
 	Psum = 0
 	N = len(Fee)
 	nums = []
+	snums=[]
 	for j in range(N):
 		if Psum <= cost:
 			Psum += Fee[j]
@@ -167,7 +173,8 @@ def cost_only(SC,Fee,cost,C):
 		else:
 			break
 
-	cost_accy = Fun_voting(nums,SC,NumV,C)
+	snums = [prc_ids_dict[i] for i in nums]
+	cost_accy = Fun_voting(snums,SC,NumV,C)
 
 	return cost_accy
 
@@ -203,7 +210,8 @@ for mt in range(0,M):
 	arr_err3 = []
 	# arr_err4 = []
 	# Assertion = np.random.uniform(0,2,)
-	for n in range(80,120,10):
+	for ratio in range(3,8,1):
+		ratio = ratio/10.0
 		ai = np.random.uniform(0.4,0.9,n)
 		bi = np.random.uniform(0.1,0.3,n)
 		ai = np.around(ai*1000)/1000
@@ -219,7 +227,7 @@ for mt in range(0,M):
 		for i in range(n):
 			dict_pr[pr[i]] = i
 			dict_ai[ai[i]] = i
-			dict_bi[i] = bi[i]  
+			dict_bi[i] = bi[i]
 
 		S_ai = deepcopy(ai)  # save the original reliability
 		S_bi = deepcopy(bi)
@@ -240,8 +248,8 @@ for mt in range(0,M):
 		Pa = ai
 		Pb = bi
 		# --#function is to generate the Matrix graph ------
-		SD_ancestor = Get_graph(n)
-		SC,C = Generate_SC(n,NumV,id_rank)
+		SD_ancestor,SD_successor = Get_graph(n,ratio)
+		SC,C = Generate_SC(n,NumV,id_rank,SD_successor)
 		#---------------------
 		for s in range(n):
 			if s in SD_ancestor.keys():
@@ -279,7 +287,7 @@ for mt in range(0,M):
 		for j in range(n):
 			abi = Rab[j]
 			ids = rab_dict[abi]
-			new_price[j] = pr[ids]
+			new_price[j] = pr[ids]  #match the prices of org sources
 			new_Ra[j] = ai[ids]
 			new_Rb[j] = bi[ids]
 
@@ -287,12 +295,14 @@ for mt in range(0,M):
 		ct = np.sort(pr)  # sort prices for smallest to highest
 		Ra_prc = np.zeros(n)
 		Rb_prc = np.zeros(n)
+		prc_ids_dict = dict()
 		# this fun: sort the prices and its corrsponding reliability
 		for i in range(n):
 			srt_prc = ct[i]
 			ids = dict_pr[srt_prc]  # find it in dict.
 			Ra_prc[i] = ai[ids]
 			Rb_prc[i] = bi[ids]
+			prc_ids_dict[i] = ids
 
 		psum = 0
 		nm = 0
@@ -308,7 +318,7 @@ for mt in range(0,M):
 
 		# errors for the baselines
 		rand_accy = rand_fun(NumV,SC,cost,s_prc,C,n)   #same as the RA,RB in the Matlab codes
-		cost_accy = cost_only(SC,ct,cost,C)
+		cost_accy = cost_only(SC,ct,cost,C,prc_ids_dict)
 
 		arr_err1.append(reb_accy)
 		arr_err2.append(rand_accy)
@@ -321,7 +331,6 @@ for mt in range(0,M):
 #-------------------------------------
 # ----calculat the mean values---
 # ------------------------------------
-
 Reb_Accy1 = np.mean(rst_err1,axis=0)
 Rand_Accy2 = np.mean(rst_err2,axis=0)
 Cost_Accy3 = np.mean(rst_err3,axis=0)

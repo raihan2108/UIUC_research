@@ -232,6 +232,8 @@ def crowdbudget(cost,R_ai,R_bi,C_credit):
 		crowd_err += err
 	return crowd_err/len(C_credit)
 
+
+###fun:generate the graph-----
 def Generate_graph(n,nk):   # generate random graph!!
 	flag = 1
 	Amtx = np.zeros([n,n])
