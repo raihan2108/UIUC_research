@@ -10,16 +10,16 @@ from copy import deepcopy
 import sys
 import random
 
+
 cost = 40
 M= 50		# Ma Carlo = 15
 NumV = 60
-n = 80
-p = 0.6  #prob of cliams of 1
-w = 0.6
+p = 0.6
+ratio = 0.4
+w = 0.7
 
 #----define the huristic alg based on the reliability
 # to choose the sources
-
 def Get_graph(N,ratio):
 	nr = int(N*(1-ratio))
 	Graph = np.zeros([N,N])
@@ -67,8 +67,6 @@ def Generate_SC(N,NumV,id_rank,SD_successor):   #sources'claims
 				cout = np.random.randint(0,100,1)
 				if cout >= 30:
 					SC01[k] = 1
-				# else:
-				# 	SC34[k] = 0
 
 			SC[j,:] = SC01
 		else:
@@ -82,9 +80,8 @@ def Generate_SC(N,NumV,id_rank,SD_successor):   #sources'claims
 			for kk in Top_rank:
 				cout = np.random.randint(0,100,1)
 				if cout >= 30:
+					# SC01[k] = 1
 					SC34[kk] = 0
-				# else:
-				# 	SC34[kk] = 1
 
 			SC[j,:] = SC34
 
@@ -94,7 +91,7 @@ def Generate_SC(N,NumV,id_rank,SD_successor):   #sources'claims
 				child = SD_successor[j]
 				for cd in child:
 					cout = np.random.randint(0,100,1)
-					if cout >= 30:
+					if cout >= 20:
 						SC[i,cd] = SC[i,j]
 
 	return SC,C
@@ -184,7 +181,7 @@ def cost_only(SC,Fee,cost,C,prc_ids_dict):
 
 	return cost_accy
 
-##----get abi based on children
+# get ai and bi
 def Get_abi(SD_successor,n):
 	Num = n
 	ai = np.zeros(Num)
@@ -217,7 +214,7 @@ def Get_abi(SD_successor,n):
 	pr = np.around(pr,decimals=3)
 	return ai,bi,pr
 
-##--SORT REB
+#---------sort ai
 def Sort_abi(ai,bi):
 	dict_ai = dict()
 	id_list = []
@@ -249,8 +246,7 @@ for mt in range(0,M):
 	arr_err3 = []
 	# arr_err4 = []
 	# Assertion = np.random.uniform(0,2,)
-	for ratio in range(3,9,1):
-		ratio = ratio/10.0
+	for n in range(70,120,10):
 		# ai = np.random.uniform(0.4,0.9,n)
 		# bi = np.random.uniform(0.1,0.3,n)
 		# ai = np.around(ai*1000)/1000
@@ -289,7 +285,7 @@ for mt in range(0,M):
 		Pa = ai
 		Pb = bi
 		# --#function is to generate the Matrix graph ------
-		SD_ancestor,SD_successor = Get_graph(n,ratio)
+		# SD_ancestor,SD_successor = Get_graph(n,ratio)
 		SC,C = Generate_SC(n,NumV,id_rank,SD_successor)
 		#---------------------
 		for s in range(n):

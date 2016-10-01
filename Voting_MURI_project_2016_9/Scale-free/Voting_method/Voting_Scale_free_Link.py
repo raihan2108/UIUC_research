@@ -10,23 +10,28 @@ from copy import deepcopy
 import sys
 import random
 
-
 cost = 40
 M= 50		# Ma Carlo = 15
 NumV = 60
-p = 0.6
-ratio = 0.3
-w = 0.6
+n = 80
+p = 0.6  #prob of cliams of 1
+w = 0.3
 
 #----define the huristic alg based on the reliability
 # to choose the sources
+
 def Get_graph(N,ratio):
 	nr = int(N*(1-ratio))
 	Graph = np.zeros([N,N])
+	ct = int((N-nr)*0.15)
 	# for i in range(1,nr):  	# dependent sources
 	# 	j = np.random.randint(0, i)
 	# 	Graph[i][j] = 1		# column is the ancestor
-	for i in range(nr+1,N):  	# dependent sources
+	for i in range(nr+1,N-2*ct):  	# dependent sources
+		j = np.random.randint(0, ct)
+		Graph[i][j] = 1
+		
+	for i in range(N-2*ct,N):
 		j = np.random.randint(0, i)
 		Graph[i][j] = 1
 
@@ -67,6 +72,8 @@ def Generate_SC(N,NumV,id_rank,SD_successor):   #sources'claims
 				cout = np.random.randint(0,100,1)
 				if cout >= 30:
 					SC01[k] = 1
+				# else:
+				# 	SC34[k] = 0
 
 			SC[j,:] = SC01
 		else:
@@ -80,8 +87,9 @@ def Generate_SC(N,NumV,id_rank,SD_successor):   #sources'claims
 			for kk in Top_rank:
 				cout = np.random.randint(0,100,1)
 				if cout >= 30:
-					# SC01[k] = 1
 					SC34[kk] = 0
+				# else:
+				# 	SC34[kk] = 1
 
 			SC[j,:] = SC34
 
@@ -91,7 +99,7 @@ def Generate_SC(N,NumV,id_rank,SD_successor):   #sources'claims
 				child = SD_successor[j]
 				for cd in child:
 					cout = np.random.randint(0,100,1)
-					if cout >= 30:
+					if cout >= 20:
 						SC[i,cd] = SC[i,j]
 
 	return SC,C
@@ -181,40 +189,7 @@ def cost_only(SC,Fee,cost,C,prc_ids_dict):
 
 	return cost_accy
 
-# get ai and bi
-def Get_abi(SD_successor,n):
-	Num = n
-	ai = np.zeros(Num)
-	bi = np.zeros(Num)
-	pr = np.zeros(Num)
-	for sd in range(n):
-		if sd in SD_successor.keys():
-			child = len(SD_successor[sd])
-			if child >=6:
-				ai[sd] = np.random.uniform(0.8,0.9)
-				bi[sd] = np.random.uniform(0.1,0.2)
-				pr[sd] = np.random.uniform(1.3,1.5)
-			elif child >= 4 and child <=5:
-				ai[sd] = np.random.uniform(0.7,0.8)
-				bi[sd] = np.random.uniform(0.2,0.3)
-				pr[sd] = np.random.uniform(1,1.4)
-			elif child>=2 and child <=3:
-				ai[sd] = np.random.uniform(0.6,0.7)
-				bi[sd] = np.random.uniform(0.3,0.4)
-				pr[sd] = np.random.uniform(0.8,1.2)
-			else:
-				ai[sd] = np.random.uniform(0.3,0.6)
-				bi[sd] = np.random.uniform(0.4,0.5)
-				pr[sd] = np.random.uniform(0.5,1)
-		else:
-			ai[sd] = np.random.uniform(0.3,0.6)
-			bi[sd] = np.random.uniform(0.4,0.5)
-			pr[sd] = np.random.uniform(0.5,1)
 
-	pr = np.around(pr,decimals=3)
-	return ai,bi,pr
-
-#---------sort ai
 def Sort_abi(ai,bi):
 	dict_ai = dict()
 	id_list = []
@@ -246,15 +221,14 @@ for mt in range(0,M):
 	arr_err3 = []
 	# arr_err4 = []
 	# Assertion = np.random.uniform(0,2,)
-	for n in range(70,120,10):
-		# ai = np.random.uniform(0.4,0.9,n)
-		# bi = np.random.uniform(0.1,0.3,n)
-		# ai = np.around(ai*1000)/1000
-		# bi = np.around(bi*1000)/1000
-		# pr = np.random.uniform(0.5,1.5, n)  # the prices for each source
-		# pr = np.around(pr,decimals=3)
-		SD_ancestor,SD_successor = Get_graph(n,ratio)
-		ai,bi,pr = Get_abi(SD_successor,n)
+	for ratio in range(3,9,1):
+		ratio = ratio/10.0
+		ai = np.random.uniform(0.4,0.9,n)
+		bi = np.random.uniform(0.1,0.3,n)
+		ai = np.around(ai*1000)/1000
+		bi = np.around(bi*1000)/1000
+		pr = np.random.uniform(0.5,1.5, n)  # the prices for each source
+		pr = np.around(pr,decimals=3)
 		bi,id_rank = Sort_abi(ai,bi)
 
 		# ---below fun: store the [ai, id]
@@ -285,7 +259,7 @@ for mt in range(0,M):
 		Pa = ai
 		Pb = bi
 		# --#function is to generate the Matrix graph ------
-		# SD_ancestor,SD_successor = Get_graph(n,ratio)
+		SD_ancestor,SD_successor = Get_graph(n,ratio)
 		SC,C = Generate_SC(n,NumV,id_rank,SD_successor)
 		#---------------------
 		for s in range(n):
