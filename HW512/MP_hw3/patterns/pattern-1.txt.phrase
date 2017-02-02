@@ -1,194 +1,82 @@
-1226 web 
-1114 retrieval 
-1075 information 
-948 based 
-766 search 
-713 document 
-698 using 
-688 model 
-547 text 
-475 information retrieval 
-405 semantic 
-388 query 
-379 system 
-349 user 
-292 approach 
-290 analysis 
-241 content 
-236 automatic 
-234 extraction 
-216 engine 
-208 similarity 
-208 image 
-206 language 
-200 clustering 
-197 classification 
-190 service 
-187 evaluation 
-180 relevance 
-177 term 
-174 web search 
-168 filtering 
-163 based retrieval 
-162 ranking 
-155 feedback 
-155 probabilistic 
-154 data 
-146 collection 
-145 page 
-145 topic 
-141 retrieval document 
-140 indexing 
-139 xml 
-138 context 
-134 collaborative 
-132 application 
-130 interface 
-130 result 
-128 study 
-128 modeling 
-125 hierarchical 
-124 search engine 
-122 based model 
-121 question 
-116 video 
-116 database 
-115 based web 
-115 measure 
-114 improving 
-114 link 
-112 multimedia 
-111 model retrieval 
-111 service web 
-109 detection 
-109 social 
-109 cross 
-108 word 
-107 interactive 
-107 web page 
-106 structured 
-105 summarization 
-104 system retrieval 
-104 based information 
-104 semantic web 
-104 performance 
-103 mining 
-102 using web 
-98 system information 
-95 structure 
-94 site 
-94 searching 
-94 entity 
-94 generation 
-93 integration 
-93 community 
-92 source 
-91 scale 
-91 information extraction 
-90 using information 
-89 answering 
-88 model information 
-88 based content 
-87 using retrieval 
-87 retrieval text 
-85 towards 
-84 latent 
-84 expansion 
-82 based document 
-80 based approach 
-80 effective 
-79 online 
-79 web information 
-77 visual 
-76 adaptive 
-76 method 
-76 answering question 
-75 browsing 
-75 using model 
-75 annotation 
-74 based search 
-74 digital 
-74 language retrieval 
-73 web query 
-72 driven 
-72 matching 
-72 relevance feedback 
-72 index 
-72 graphical 
-71 retrieval image 
-70 ontology 
-69 relationship 
-69 world 
-69 building 
-69 evaluating 
-69 extracting 
-69 cluster 
-68 recommendation 
-68 using document 
-68 filtering collaborative 
-67 personalized 
-66 query retrieval 
-66 language model 
-65 web site 
-63 tool 
-63 based using 
-63 structural 
-62 language information 
-62 concept 
-62 network 
-61 statistical 
-61 knowledge 
-60 corpus 
-60 news 
-59 detecting 
-59 result search 
-59 keyword 
-59 using query 
-58 retrieval content 
-58 via 
-58 query expansion 
-58 based system 
-58 translation 
-57 library 
-57 selection 
-57 model information retrieval 
-56 classification text 
-56 web document 
-56 using search 
-56 log 
-56 self 
-55 specific 
-55 dynamic 
-55 internet 
-54 clustering document 
-54 model document 
-54 abstract 
-54 system information retrieval 
-54 language information retrieval 
-53 segmentation 
-53 multiple 
-53 search similarity 
-52 web user 
-52 based similarity 
-52 music 
-51 finding 
-51 based text 
-51 query search 
-51 personal 
-51 sentence 
-51 representation 
-51 model probabilistic 
-50 information document 
-50 support 
-50 evaluation retrieval 
-50 based query 
-50 based clustering 
-49 approach retrieval 
-49 based information retrieval 
-49 disambiguation 
-49 automated 
-49 domain 
-49 information text 
-49 text document 
-49 schema 
-49 using text 
+1782 query 
+1340 data 
+983 mining 
+943 database 
+869 clustering 
+731 efficient 
+630 rule 
+569 based 
+517 pattern 
+506 object 
+459 time 
+424 processing 
+417 stream 
+393 oriented 
+378 temporal 
+345 relational 
+336 association 
+335 using 
+327 optimization 
+324 algorithm 
+309 mining data 
+309 constraint 
+290 xml 
+280 approach 
+277 set 
+271 spatial 
+266 query processing 
+265 join 
+239 rule association 
+227 frequent 
+218 data stream 
+209 series 
+201 view 
+201 mining pattern 
+200 object oriented 
+199 index 
+192 method 
+192 discovery 
+189 time series 
+181 evaluation 
+172 database query 
+171 relation 
+169 query optimization 
+165 technique 
+163 rule mining 
+158 mining association 
+158 clustering data 
+154 complex 
+151 reasoning 
+147 multi 
+145 framework 
+144 dimensional 
+142 query data 
+142 graph 
+136 similarity 
+132 query efficient 
+132 cluster 
+131 matching 
+131 approximate 
+130 incremental 
+129 database object 
+127 fast 
+127 mining frequent 
+126 model 
+124 event 
+123 rule mining association 
+121 data efficient 
+121 maintenance 
+119 detection 
+118 expression 
+118 multiple 
+117 dependency 
+115 structure 
+115 discovering 
+114 attribute 
+114 extended 
+113 sequence 
+112 adaptive 
+110 distributed 
+109 aggregate 
+109 continuous 
+106 update 

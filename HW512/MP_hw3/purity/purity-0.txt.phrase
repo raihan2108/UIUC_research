@@ -1,176 +1,72 @@
-0.79518 neighbor 
-0.79518 query view 
-0.79518 server 
-0.79518 system processing 
-0.79518 aggregate 
-0.79518 storage 
-0.79518 cache 
-0.79518 query processing 
-0.79518 xml efficient 
-0.79518 peer 
-0.79518 stream processing 
-0.79518 processor 
-0.79518 query distributed 
-0.79518 query relational 
-0.79518 object query 
-0.79518 selectivity 
-0.79518 privacy preserving 
-0.79518 query stream 
-0.79518 distributed processing 
-0.79518 optimization 
-0.79518 hash 
-0.79518 buffer 
-0.79518 query continuous 
-0.79518 moving 
-0.79518 spatio 
-0.79518 processing efficient 
-0.79518 query processing efficient 
-0.79518 join 
-0.79518 file 
-0.79518 data warehouse 
-0.79518 xpath 
-0.79518 load 
-0.79518 query efficient 
-0.79518 query optimization 
-0.79518 warehouse 
-0.79518 range 
-0.79518 nearest 
-0.79518 materialized view 
-0.79518 neighbor nearest 
-0.79518 client 
-0.79518 database processing 
-0.79518 hashing 
-0.79518 materialized 
-0.79169 data access 
-0.77897 data view 
-0.77653 sql 
-0.76311 processing 
-0.75416 query data 
-0.74206 data processing 
-0.73702 data distributed 
-0.72725 preserving 
-0.72082 shared 
-0.71590 database query 
-0.68616 evaluation query 
-0.68100 query xml 
-0.67575 xquery 
-0.67575 broadcast 
-0.67438 xml data 
-0.63763 disk 
-0.62444 management data 
-0.61933 streaming 
-0.61924 caching 
-0.61739 maintenance 
-0.61585 cube 
-0.61502 system query 
-0.61075 operation 
-0.60651 privacy 
-0.60443 integration data 
-0.59992 database efficient 
-0.59926 data privacy 
-0.59797 scalable 
-0.59465 sharing 
-0.59005 query answering 
-0.58926 database data 
-0.58209 access 
-0.57405 parallel 
-0.55813 querying 
-0.54771 allocation 
-0.54060 statistic 
-0.54005 view 
-0.53494 monitoring 
-0.52216 memory 
-0.51895 aggregation 
-0.50567 olap 
-0.50371 multidimensional 
-0.50002 query 
-0.49356 system data 
-0.49074 data relational 
-0.47084 managing 
-0.46197 distributed 
-0.45358 sensor 
-0.44725 execution 
-0.44423 index 
-0.42594 data efficient 
-0.42542 spatial 
-0.40602 xml 
-0.40045 supporting 
-0.39852 optimizing 
-0.39242 flexible 
-0.32892 performance 
-0.32767 top 
-0.32605 scheme 
-0.31843 aware 
-0.31081 dynamic 
-0.30569 update 
-0.30261 computation 
-0.30202 efficient 
-0.28650 management 
-0.28169 approximate 
-0.26139 database distributed 
-0.23705 database management 
-0.22827 heterogeneous 
-0.22041 stream 
-0.16090 continuous 
-0.13786 panel 
-0.13456 system management 
-0.13310 transaction 
-0.12755 adaptive 
-0.10679 system distributed 
-0.08678 data stream 
-0.08495 computing 
-0.06252 data 
-0.04742 indexing 
--0.05101 evaluation 
--0.05860 scheduling 
--0.06926 implementation 
--0.07147 complex 
--0.08529 using query 
--0.09277 integration 
--0.10453 environment 
--0.12673 database 
--0.12742 database relational 
--0.13581 architecture 
--0.21296 relational 
--0.23541 temporal 
--0.25162 strategy 
--0.26298 mobile 
--0.29020 database system 
--0.32201 incremental 
--0.33276 complexity 
--0.33352 structure 
--0.43929 expression 
--0.44864 online 
--0.45472 answering 
--0.48291 source 
--0.49842 multiple 
--0.54093 relation 
--0.54656 framework 
--0.57598 technique 
--0.58415 multi 
--0.62759 fast 
--0.65064 path 
--0.65222 schema 
--0.65797 object 
--0.66710 network 
--0.72390 application 
--0.76312 system 
--0.79160 support 
--0.80626 structured 
--0.86598 cost 
--1.04293 approach 
--1.12193 method 
--1.12332 dimensional 
--1.13455 optimal 
--1.15605 service 
--1.27741 estimation 
--1.45789 algorithm 
--1.49366 using 
--1.53017 design 
--1.95773 set 
--2.11563 based 
--2.30580 mining data 
--2.39652 information 
--2.72839 time 
--2.90202 search 
--3.35399 mining 
+0.79356 word 
+0.79356 relevance 
+0.79356 retrieval document 
+0.79356 context 
+0.79356 text 
+0.79356 categorization 
+0.79356 logic 
+0.79356 link 
+0.79356 summarization 
+0.79356 social 
+0.79356 preserving 
+0.79356 web page 
+0.79356 topic 
+0.79356 belief 
+0.79356 term 
+0.77040 based retrieval 
+0.73698 web search 
+0.72658 page 
+0.72599 feedback 
+0.71513 filtering 
+0.70915 document 
+0.69002 automatic 
+0.68946 collection 
+0.67462 extraction 
+0.62974 content 
+0.60092 description 
+0.59257 retrieval 
+0.58460 program 
+0.57746 semantic 
+0.54439 theory 
+0.52932 collaborative 
+0.49099 semantics 
+0.45037 privacy 
+0.40156 information retrieval 
+0.38664 understanding 
+0.33356 engine 
+0.30974 result 
+0.28128 ranking 
+0.26349 web 
+0.26040 probabilistic 
+0.23717 visual 
+0.20797 generation 
+0.19896 improving 
+0.15435 reasoning 
+0.14791 structured 
+0.07754 study 
+0.06567 information 
+0.02508 based 
+-0.03112 network 
+-0.03513 inference 
+-0.04004 programming 
+-0.04754 analysis 
+-0.05981 modeling 
+-0.08352 hierarchical 
+-0.08435 using 
+-0.08642 search 
+-0.18921 model 
+-0.21119 approach 
+-0.27223 similarity 
+-0.28239 structure 
+-0.30312 indexing 
+-0.35510 classification 
+-0.41114 framework 
+-0.53169 representation 
+-0.58321 feature 
+-0.81030 method 
+-0.88600 image 
+-1.04040 language 
+-1.66234 knowledge 
+-1.89283 mining 
+-1.98182 data 
+-3.65621 system 

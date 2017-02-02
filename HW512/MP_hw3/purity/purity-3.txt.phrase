@@ -1,196 +1,77 @@
-0.71829 learning semi 
-0.71829 training 
-0.71829 local 
-0.71829 minimum 
-0.71829 support machine 
-0.71829 vector 
-0.71829 invariant 
-0.71829 feature 
-0.71829 learning supervised 
-0.71829 approximation 
-0.71829 learning bayesian 
-0.71829 bayes 
-0.71829 support machine vector 
-0.71829 algorithm approximation 
-0.71829 network bayesian 
-0.71829 boosting 
-0.71829 semi supervised 
-0.71829 ensemble 
-0.71829 discriminant 
-0.71829 supervised 
-0.71829 artificial 
-0.71829 motion 
-0.71829 categorization 
-0.71829 reconstruction 
-0.71829 surface 
-0.71829 density 
-0.71829 dimensionality 
-0.71829 kernel 
-0.71829 color 
-0.71829 reduction 
-0.71829 machine vector 
-0.71829 bayesian 
-0.71829 stereo 
-0.71829 classifier 
-0.71829 outlier 
-0.71829 metric 
-0.71829 shape 
-0.71829 edge 
-0.71829 feature selection 
-0.71829 maximum 
-0.71829 regression 
-0.71829 learning classification 
-0.71829 support vector 
-0.71829 planar 
-0.71829 intelligence artificial 
-0.71829 dimensionality reduction 
-0.71829 curve 
-0.71829 convex 
-0.71829 text categorization 
-0.69368 learning function 
-0.68910 subspace 
-0.68224 class 
-0.67046 sparse 
-0.66993 semi 
-0.66898 spectral 
-0.66681 camera 
-0.65608 approximating 
-0.65560 field 
-0.65093 error 
-0.65065 matrix 
-0.64892 learning active 
-0.64790 randomized 
-0.64009 distance 
-0.63485 parameter 
-0.62776 entropy 
-0.62687 flow 
-0.62586 probability 
-0.60553 linear 
-0.59483 learning network 
-0.59222 geometric 
-0.59029 learning algorithm 
-0.58336 instance 
-0.56502 network neural 
-0.55301 selection 
-0.55100 learning using 
-0.54837 lower 
-0.54569 using network 
-0.54546 using recognition 
-0.52849 neural 
-0.51125 robust 
-0.50879 learning machine 
-0.50417 line 
-0.50033 unsupervised 
-0.48959 via 
-0.48667 conditional 
-0.48402 reinforcement 
-0.47479 learning reinforcement 
-0.45777 random 
-0.45311 scene 
-0.44869 projection 
-0.44771 mixture 
-0.44654 machine 
-0.43945 tracking 
-0.43382 function 
-0.43101 improved 
-0.41811 labeling 
-0.41559 space 
-0.40296 learning multi 
-0.40216 estimation 
-0.38572 directed 
-0.38405 classification using 
-0.37909 variable 
-0.37168 detection 
-0.35609 dimensional 
-0.35446 distribution 
-0.35108 dimension 
-0.34991 region 
-0.34333 markov 
-0.34277 empirical 
-0.33934 recognition 
-0.32366 simple 
-0.31992 sensitive 
-0.31902 bound 
-0.31562 optimal 
-0.31324 method 
-0.31167 sampling 
-0.31011 learning 
-0.29695 classification 
-0.29683 combinatorial 
-0.29401 map 
-0.27469 polynomial 
-0.26290 cost 
-0.24547 clustering 
-0.24173 segmentation 
-0.23287 clustering algorithm 
-0.23279 learning model 
-0.22938 solution 
-0.22603 intelligence 
-0.22593 decomposition 
-0.21486 support 
-0.21425 algorithm graph 
-0.19571 combining 
-0.18648 comparison 
-0.17565 algorithm 
-0.17350 matching 
-0.17305 network 
-0.16477 path 
-0.15821 weighted 
-0.14788 self 
-0.14619 learning based 
-0.12981 multi 
-0.12461 using algorithm 
-0.11853 image 
-0.11851 active 
-0.08089 multiple 
-0.06935 graph 
-0.05416 stochastic 
-0.00460 fast 
-0.00410 routing 
-0.00405 based algorithm 
--0.02751 structure 
--0.04270 test 
--0.04832 online 
--0.11745 analysis 
--0.12571 cluster 
--0.15660 using 
--0.19041 based clustering 
--0.19977 statistical 
--0.26249 hierarchical 
--0.29070 process 
--0.30082 value 
--0.31028 generalized 
--0.38072 application 
--0.42366 scale 
--0.42941 computing 
--0.47093 using model 
--0.48565 adaptive 
--0.51119 finding 
--0.53250 continuous 
--0.55281 sequence 
--0.65511 model 
--0.67624 attribute 
--0.70975 approach 
--0.72703 approximate 
--0.76212 based 
--0.76542 computation 
--0.78089 dynamic 
--0.81036 scheme 
--0.88344 tree 
--0.95902 framework 
--0.96520 modeling 
--0.97319 probabilistic 
--1.04421 decision tree 
--1.18117 programming 
--1.18489 decision 
--1.20569 ranking 
--1.35403 view 
--1.38578 representation 
--1.39311 object 
--1.40967 text 
--1.46933 technique 
--1.51144 set 
--1.59805 efficient 
--1.64838 automatic 
--1.76314 time 
--2.47855 data 
+0.76671 base 
+0.76671 panel 
+0.76671 intelligent 
+0.76671 knowledge base 
+0.76671 database system 
+0.76671 design 
+0.76671 interface 
+0.76671 architecture 
+0.76671 service 
+0.76671 database management 
+0.76671 peer 
+0.76671 language natural 
+0.76671 knowledge system 
+0.76671 user 
+0.76671 management data 
+0.76671 base data 
+0.76671 server 
+0.76671 technology 
+0.76671 system management 
+0.76671 intelligence 
+0.76671 natural 
+0.76671 research 
+0.76671 management 
+0.75258 system data 
+0.75043 system expert 
+0.73042 system distributed 
+0.72682 engineering 
+0.69483 storage 
+0.68113 system 
+0.65764 system information 
+0.64990 database distributed 
+0.61638 based system 
+0.58786 integrating 
+0.58130 tool 
+0.57861 expert 
+0.53844 integration 
+0.52251 implementation 
+0.51928 computer 
+0.49000 knowledge 
+0.48108 mobile 
+0.46665 distributed 
+0.46293 source 
+0.45392 towards 
+0.44170 acquisition 
+0.38998 environment 
+0.33917 abstract 
+0.31878 transaction 
+0.31547 language 
+0.29278 schema 
+0.28013 application 
+0.26377 access 
+0.24473 interactive 
+0.10149 database 
+0.07206 representation 
+-0.05947 parallel 
+-0.11202 database relational 
+-0.11933 performance 
+-0.12566 data 
+-0.26305 framework 
+-0.35124 discovery 
+-0.44924 xml 
+-0.45147 model 
+-0.47852 information 
+-0.51324 evaluation 
+-0.53030 based 
+-0.63089 relational 
+-0.65660 network 
+-0.73161 approach 
+-0.77414 processing 
+-0.80303 web 
+-0.87241 control 
+-0.92075 object 
+-1.02303 mining data 
+-1.12081 information retrieval 
+-1.81566 retrieval 
+-1.83264 mining 
+-2.56245 query 

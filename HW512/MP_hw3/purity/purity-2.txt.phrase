@@ -1,154 +1,76 @@
-0.85776 mining pattern 
-0.85776 tree search 
-0.85776 time data series 
-0.85776 data series 
-0.85776 sequential mining 
-0.85776 association 
-0.85776 rule association 
-0.85776 discovery rule 
-0.85776 frequent 
-0.85776 concurrent 
-0.85776 rule mining association 
-0.85776 rule 
-0.85776 rough 
-0.85776 mining set 
-0.85776 pattern 
-0.85776 series 
-0.85776 mining association 
-0.85776 natural 
-0.85776 rule mining 
-0.85776 mining frequent 
-0.85776 frequent pattern 
-0.85776 pruning 
-0.85776 tree data 
-0.85776 window 
-0.85776 language natural 
-0.85776 time series 
-0.85776 based rule 
-0.85776 definition 
-0.85776 data pattern 
-0.85776 sense 
-0.85776 maximal 
-0.85776 mining graph 
-0.85776 mining frequent pattern 
-0.85776 quantitative 
-0.85776 itemsets 
-0.85776 sequential pattern 
-0.85776 gene 
-0.85776 tree pattern 
-0.85776 rule data 
-0.85776 using rule 
-0.85776 time mining 
-0.83891 algorithm mining 
-0.80812 closed 
-0.78850 mining efficient 
-0.76075 mining 
-0.74446 grammar 
-0.74190 induction 
-0.73065 time data 
-0.72450 plan 
-0.71597 real time 
-0.69802 real 
-0.69323 sequential 
-0.67898 mining data 
-0.67556 massive 
-0.66814 partially 
-0.66693 identifying 
-0.65911 time 
-0.62427 data set 
-0.61898 interval 
-0.61434 using mining 
-0.61019 based mining 
-0.60341 discovering 
-0.59784 set 
-0.58985 heuristic 
-0.58854 consistency 
-0.56826 database mining 
-0.52997 item 
-0.51304 protein 
-0.49947 binary 
-0.49496 decision 
-0.46486 generating 
-0.45092 extended abstract 
-0.44001 decision tree 
-0.39833 based data 
-0.39310 power 
-0.36713 tree 
-0.35176 event 
-0.34941 testing 
-0.34043 genetic 
-0.32114 dependency 
-0.31221 satisfaction 
-0.29746 application data 
-0.29731 visualization 
-0.29383 constraint satisfaction 
-0.28588 prediction 
-0.25865 clustering data 
-0.25326 attribute 
-0.23122 algorithm data 
-0.20294 discovery 
-0.18790 exploration 
-0.17190 sequence 
-0.15879 construction 
-0.15271 technique 
-0.14171 finding 
-0.07901 extended 
-0.07789 using data 
-0.05940 expression 
-0.03642 application 
-0.03349 explanation 
-0.02126 partial 
-0.01472 generation 
-0.01369 fuzzy 
-0.00326 abstract 
--0.02386 language 
--0.02821 generalized 
--0.03386 incremental 
--0.03737 value 
--0.04729 process 
--0.08736 world 
--0.11228 temporal 
--0.15283 constraint 
--0.23818 complexity 
--0.30497 scheduling 
--0.35559 functional 
--0.36566 visual 
--0.37450 interactive 
--0.38782 driven 
--0.41378 fast 
--0.47066 data 
--0.50811 data stream 
--0.52116 graph 
--0.62340 domain 
--0.70269 result 
--0.71110 measure 
--0.72975 algorithm 
--0.74781 stream 
--0.76940 concept 
--0.79552 matching 
--0.81117 planning 
--0.81953 support 
--0.88740 approach 
--0.93044 efficient 
--0.93424 using 
--1.01464 based 
--1.01535 search 
--1.06763 structure 
--1.07738 dynamic 
--1.09398 optimal 
--1.10091 clustering 
--1.17024 recognition 
--1.17544 probabilistic 
--1.22439 method 
--1.22968 representation 
--1.25845 similarity 
--1.28729 spatial 
--1.29280 analysis 
--1.45774 space 
--1.54095 theory 
--1.59838 machine 
--1.83877 model 
--1.95720 parallel 
--2.14655 learning 
--2.25889 database 
--2.57258 knowledge 
+0.81069 learning model 
+0.81069 learning based 
+0.81069 learning using 
+0.81069 learning 
+0.81069 learning machine 
+0.81069 supervised 
+0.81069 support machine 
+0.81069 classifier 
+0.81069 reinforcement 
+0.81069 support machine vector 
+0.81069 vector 
+0.81069 machine vector 
+0.81069 support vector 
+0.81069 learning reinforcement 
+0.81069 semi supervised 
+0.81069 training 
+0.79578 decision 
+0.79079 decision tree 
+0.78295 unsupervised 
+0.75775 protocol 
+0.74293 machine 
+0.68625 planning 
+0.65493 semi 
+0.63897 boosting 
+0.63851 regression 
+0.61178 class 
+0.59788 feature selection 
+0.57573 example 
+0.55455 solving 
+0.53822 plan 
+0.51189 active 
+0.50156 selection 
+0.49211 bayesian 
+0.47162 action 
+0.44345 strategy 
+0.42940 robot 
+0.38443 function 
+0.38185 kernel 
+0.37502 support 
+0.36801 task 
+0.36668 value 
+0.36580 agent 
+0.34997 control 
+0.33985 domain 
+0.33546 multi 
+0.29555 process 
+0.29255 comparison 
+0.29083 cost 
+0.17450 memory 
+0.14779 feature 
+0.11517 game 
+0.10252 concept 
+0.06270 method 
+0.00606 adaptive 
+-0.01419 classification 
+-0.01577 multiple 
+-0.14271 approach 
+-0.16461 model 
+-0.20366 real 
+-0.20983 performance 
+-0.27907 using 
+-0.28004 hierarchical 
+-0.28290 parallel 
+-0.46794 via 
+-0.48922 based 
+-0.57151 dynamic 
+-0.63203 analysis 
+-0.65271 linear 
+-0.75111 tree 
+-1.05791 space 
+-1.14545 algorithm 
+-1.44729 time 
+-1.47557 distributed 
+-1.76160 rule 
+-2.03017 data 
+-3.09435 system 

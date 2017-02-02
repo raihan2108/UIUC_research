@@ -1,115 +1,59 @@
-379 mining data 
-192 technique 
-178 learning 
-155 plan 
-155 approach 
-152 real time 
-147 sequence 
-146 temporal 
-139 heuristic 
-136 discovering 
-134 decision tree 
-132 induction 
-123 rule mining association 
-123 model 
-117 finding 
-116 language natural 
-114 generation 
-112 fast 
-112 planning 
-108 dependency 
-101 attribute 
-97 data stream 
-94 analysis 
-93 consistency 
-91 dynamic 
-91 method 
-90 event 
-90 prediction 
-85 pruning 
-84 domain 
-83 generating 
-81 process 
-80 extended abstract 
-78 generalized 
-77 value 
-77 interactive 
-76 recognition 
-76 support 
-76 knowledge 
-76 incremental 
-76 algorithm mining 
-74 data set 
-73 window 
-72 world 
-71 closed 
-69 expression 
-68 representation 
-67 scheduling 
-67 space 
-67 concurrent 
-66 optimal 
-65 result 
-65 construction 
-64 based data 
-63 gene 
-63 structure 
-63 concept 
-62 itemsets 
-62 matching 
-62 theory 
-61 complexity 
-61 similarity 
-61 mining efficient 
-61 explanation 
-61 binary 
-60 visualization 
-59 application data 
-58 fuzzy 
-57 machine 
-57 data pattern 
-57 quantitative 
-57 partially 
-57 algorithm data 
-57 measure 
-56 partial 
-56 visual 
-56 sequential pattern 
-55 exploration 
-55 rough 
-55 tree data 
-54 parallel 
-54 database mining 
-54 grammar 
-53 sense 
-53 based mining 
-53 using rule 
-53 using data 
-52 identifying 
-52 genetic 
-52 constraint satisfaction 
-52 massive 
-52 spatial 
-51 driven 
-51 rule data 
-51 based rule 
-51 clustering data 
-51 testing 
-50 discovery rule 
-50 power 
-50 interval 
-50 mining set 
-49 time mining 
-49 maximal 
-49 definition 
-49 mining frequent pattern 
-49 probabilistic 
-49 using mining 
-48 protein 
-48 tree pattern 
-48 mining graph 
-47 tree search 
-47 time data series 
-47 item 
-47 functional 
-47 sequential mining 
+352 classification 
+334 algorithm 
+333 planning 
+322 approach 
+312 multi 
+280 classifier 
+260 control 
+247 method 
+222 data 
+212 learning reinforcement 
+203 agent 
+192 bayesian 
+192 function 
+183 analysis 
+181 performance 
+177 domain 
+175 process 
+175 solving 
+169 robot 
+166 active 
+163 class 
+156 kernel 
+150 multiple 
+150 dynamic 
+147 system 
+144 decision tree 
+142 regression 
+139 learning using 
+136 cost 
+135 memory 
+134 concept 
+133 learning machine 
+132 adaptive 
+122 strategy 
+121 learning based 
+119 rule 
+118 boosting 
+117 action 
+117 learning model 
+116 value 
+115 plan 
+115 support machine vector 
+115 via 
+115 parallel 
+113 feature selection 
+113 time 
+113 game 
+112 space 
+110 example 
+107 training 
+107 protocol 
+106 hierarchical 
+106 distributed 
+105 semi supervised 
+103 unsupervised 
+102 task 
+101 comparison 
+100 real 
+99 linear 
